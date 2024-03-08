@@ -7,6 +7,8 @@
 
 #include <string>
 #include "employee.h"
+#include "state.h"
+#include <memory>
 
 
 class Project {
@@ -15,6 +17,7 @@ class Project {
   std::string description;
   std::string timeline;
   double budget;
+  std::unique_ptr<State> status = std::make_unique<Preparing>();
 
   Project(std::string& name,
           std::string& description,
