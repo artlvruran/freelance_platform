@@ -24,7 +24,7 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   if (new_status != nullptr) {
     bid.status = std::move(new_status);
   }
-
+// Добавить проверку на то что заказчик курирует именно этот проект
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
