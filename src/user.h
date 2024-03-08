@@ -5,6 +5,7 @@
 #ifndef FREELANCEPLATFORM_SRC_USER_H_
 #define FREELANCEPLATFORM_SRC_USER_H_
 
+#pragma once
 #include <iostream>
 #include <string>
 #include <utility>

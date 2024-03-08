@@ -4,9 +4,15 @@
 
 #ifndef FREELANCEPLATFORM_SRC_STATE_H_
 #define FREELANCEPLATFORM_SRC_STATE_H_
-#include "project.h"
+#pragma once
 #include <iostream>
 #include <memory>
+
+enum event {
+  start,
+  hired,
+  completed
+};
 
 struct State {
   virtual std::unique_ptr<State> on_event(event e) = 0;

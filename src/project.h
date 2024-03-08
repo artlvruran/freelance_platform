@@ -5,16 +5,13 @@
 #ifndef FREELANCEPLATFORM_SRC_PROJECT_H_
 #define FREELANCEPLATFORM_SRC_PROJECT_H_
 
+#pragma once
 #include <string>
 #include "employee.h"
 #include "state.h"
 #include <memory>
+#include <utility>
 
-enum event {
-  start,
-  hired,
-  completed
-};
 
 class Project {
  public:
@@ -24,28 +21,28 @@ class Project {
   double budget;
   std::unique_ptr<State> status = std::make_unique<Preparing>();
 
-  Project(std::string& name,
-          std::string& description,
-          std::string& timeline,
+  Project(std::string  name,
+          std::string  description,
+          std::string  timeline,
           double budget) :
-          name(name),
-          description(description),
-          timeline(timeline),
+          name(std::move(name)),
+          description(std::move(description)),
+          timeline(std::move(timeline)),
           budget(budget) {};
 
   void advance(event e);
 };
 
-class LongTermJob : Project {
+class LongTermJob : public Project {
   using Project::Project;
 };
 
-class Task : Project {
+class Task : public Project {
   using Project::Project;
 
 };
 
-class Contest : Project {
+class Contest : public Project {
   using Project::Project;
 
 };
