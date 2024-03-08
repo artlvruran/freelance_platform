@@ -8,8 +8,6 @@
 #include "src/constants.h"
 
 int main() {
-
-
   Employee employee("test", "password", "test@test.com", "software engineering", "Russia", "Moscow");
   employee.sign_up();
   Contractor contractor("boss", "boss_password", "boss@boss.com", "software engineering", "Russia", "Moscow");
