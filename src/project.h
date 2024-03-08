@@ -10,6 +10,11 @@
 #include "state.h"
 #include <memory>
 
+enum event {
+  start,
+  hired,
+  completed
+};
 
 class Project {
  public:
@@ -27,6 +32,8 @@ class Project {
           description(description),
           timeline(timeline),
           budget(budget) {};
+
+  void advance(event e);
 };
 
 class LongTermJob : Project {
