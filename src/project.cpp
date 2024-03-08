@@ -10,6 +10,12 @@
 
 
 void Project::advance(event e) {
+  auto new_status = status->on_event(e);
+  if (new_status == nullptr) {
+    throw std::runtime_error("event incorrect");
+  }
+  status = std::move(new_status);
+
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
@@ -31,16 +37,4 @@ void Project::advance(event e) {
                      "WHERE id = %d") % number % id).str();
   rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
   sqlite3_close(db);
-  status = status->on_event(e);
 }
-
-/*
-  std::string name;
-  std::string details;
-  std::string timeline;
-  double budget;
-  bool completed = false;
-  std::vector<Employee> bids;
-  std::vector<Employee> participants;
-
-*/

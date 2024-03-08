@@ -8,13 +8,13 @@
 #pragma once
 #include "user.h"
 #include "project.h"
+#include "bid.h"
 
 class Contractor : public User {
  public:
   using User::User;
   void add_project(const Project& project);
-  void approve_bid(const Project& project);
-  void reject_bid(const Project& project);
+  void consider_bid(Bid& bid, bid_event e);
   void fire_worker(const Project& project);
   void end_project(const Project& project);
   void sign_up() const override;

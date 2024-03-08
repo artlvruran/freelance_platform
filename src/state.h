@@ -24,7 +24,6 @@ struct Preparing : State {
 
 struct Processing : State {
   std::unique_ptr<State> on_event(event e) override;
-
 };
 
 struct Completed : State {
