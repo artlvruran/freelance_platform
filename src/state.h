@@ -8,12 +8,6 @@
 #include <iostream>
 #include <memory>
 
-enum event {
-  start,
-  hired,
-  completed
-};
-
 struct State {
   virtual std::unique_ptr<State> on_event(event e) = 0;
 };
