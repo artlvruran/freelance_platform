@@ -2,6 +2,7 @@
 // Created by kirill on 26.02.24.
 //
 
+#pragma once
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"
@@ -11,7 +12,7 @@
 void Contractor::sign_up() const {
   sqlite3 *db;
   int rc;
-  rc = sqlite3_open(constants::db_source, &db);
+  rc = sqlite3_open(db_source, &db);
   std::string request =
       (boost::format("INSERT INTO contractors ('username', 'email', 'password') VALUES ('%s', '%s', '%s')") % username % email % password).str();
   rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
@@ -26,9 +27,8 @@ void Contractor::add_project(const Project &project) {
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
-  rc = sqlite3_open(constants::db_source, &db);
-  std::string find_request = (boost::format ("SELECT id from contractors"
-                                             "WHERE username = %s") % username).str();
+  rc = sqlite3_open(db_source, &db);
+  std::string find_request = (boost::format ("SELECT id from contractors WHERE username = '%s'") % username).str();
 
   rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
   if (rc != SQLITE_OK) {
@@ -37,7 +37,7 @@ void Contractor::add_project(const Project &project) {
   int id = sqlite3_column_int(stmt, 0);
 
   std::string request =
-      (boost::format("INSERT INTO projects ('name', 'description', 'contractor_id', 'completed) VALUES ('%s', '%s', '%d', %b)") % project.name % project.description % id % false).str();
+      (boost::format("INSERT INTO projects ('name', 'description', 'contractor_id', 'state') VALUES ('%s', '%s', '%d', '%d')") % project.name % project.description % id % 0).str();
   rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
   sqlite3_close(db);
 }

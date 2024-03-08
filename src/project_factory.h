@@ -5,6 +5,7 @@
 #ifndef FREELANCEPLATFORM_SRC_PROJECT_FACTORY_H_
 #define FREELANCEPLATFORM_SRC_PROJECT_FACTORY_H_
 
+#pragma once
 #include "project.h"
 
 class ProjectFactory {

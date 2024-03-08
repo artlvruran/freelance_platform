@@ -5,6 +5,7 @@
 #ifndef FREELANCEPLATFORM_SRC_EMPLOYEE_H_
 #define FREELANCEPLATFORM_SRC_EMPLOYEE_H_
 
+#pragma once
 #include "user.h"
 
 class Employee : public User {

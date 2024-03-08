@@ -5,6 +5,7 @@
 #ifndef FREELANCEPLATFORM_SRC_CONTRACTOR_H_
 #define FREELANCEPLATFORM_SRC_CONTRACTOR_H_
 
+#pragma once
 #include "user.h"
 #include "project.h"
 

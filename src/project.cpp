@@ -2,6 +2,7 @@
 // Created by kirill on 26.02.24.
 //
 
+#pragma once
 #include "project.h"
 #include "sqlite3.h"
 #include "constants.h"
@@ -12,7 +13,7 @@ void Project::advance(event e) {
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
-  rc = sqlite3_open(constants::db_source, &db);
+  rc = sqlite3_open(db_source, &db);
   int number = (e == event::start ? 0 : (e == event::hired ? 1 : 2));
 
   std::string find_request = (boost::format ("SELECT id from projects"
