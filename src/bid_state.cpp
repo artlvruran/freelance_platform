@@ -12,6 +12,9 @@ std::unique_ptr<BidState> BidStateConsidering::on_event(bid_event e) {
 }
 
 std::unique_ptr<BidState> BidStateApproved::on_event(bid_event e) {
+  if (e == bid_event::reject) {
+    return std::make_unique<BidStateRejected>();
+  }
   return nullptr;
 }
 

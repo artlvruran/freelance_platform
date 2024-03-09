@@ -15,6 +15,7 @@
 
 class Project {
  public:
+  int id;
   std::string name;
   std::string description;
   std::string timeline;
@@ -44,7 +45,6 @@ class Task : public Project {
 
 class Contest : public Project {
   using Project::Project;
-
 };
 
 
