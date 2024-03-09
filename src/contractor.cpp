@@ -85,6 +85,11 @@ void fire_worker(const Project& project, const Employee& employee) {
 
   std::string request =
       (boost::format("DELETE FROM bids WHERE employee_id = %d AND project_id = %d") % employee_id % project.id).str();
+  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
+  if (rc != SQLITE_OK) {
+    throw std::runtime_error("Error in deleting employee");
+  }
+  sqlite3_close(db);
 }
 
 void end_project(Project& project) {
