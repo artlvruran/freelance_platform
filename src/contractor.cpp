@@ -15,7 +15,7 @@ void Contractor::sign_up() const {
   rc = sqlite3_open(db_source, &db);
   std::string request =
       (boost::format("INSERT INTO contractors ('username', 'email', 'password') VALUES ('%s', '%s', '%s')") % username % email % password).str();
-  rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
+  sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   sqlite3_close(db);
 }
 
@@ -63,7 +63,7 @@ void Contractor::add_project(const Project &project) {
 
   std::string request =
       (boost::format("INSERT INTO projects ('name', 'description', 'contractor_id', 'state') VALUES ('%s', '%s', '%d', '%d')") % project.name % project.description % id % 0).str();
-  rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
+  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   if (rc != SQLITE_OK) {
     throw std::runtime_error("Error in insertion project in db");
   }
@@ -71,7 +71,6 @@ void Contractor::add_project(const Project &project) {
 }
 
 void fire_worker(const Project& project, const Employee& employee) {
-  //deleting from table bids
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
