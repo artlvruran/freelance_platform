@@ -69,7 +69,29 @@ void Contractor::add_project(const Project &project) {
   }
   sqlite3_close(db);
 }
-void approve_bid(const Project& project);
-void reject_bid(const Project& project);
-void fire_worker(const Project& project);
-void end_project(const Project& project);
+
+void fire_worker(const Project& project, const Employee& employee) {
+  //deleting from table bids
+  sqlite3 *db;
+  sqlite3_stmt *stmt;
+  int rc;
+  rc = sqlite3_open(db_source, &db);
+
+  std::string find_request = (boost::format ("SELECT id from employees WHERE username = '%s'") % employee.username).str();
+  rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
+  if (rc != SQLITE_OK) {
+    throw std::runtime_error("Employee not found");
+  }
+  int employee_id = sqlite3_column_int(stmt, 0);
+
+  std::string request =
+      (boost::format("DELETE FROM bids WHERE employee_id = %d AND project_id = %d") % employee_id % project.id).str();
+}
+
+void end_project(Project& project) {
+  project.advance(event::completed);
+}
+
+void end_project_hiring(Project& project) {
+  project.advance(event::hired);
+}
