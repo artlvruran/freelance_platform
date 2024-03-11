@@ -13,10 +13,6 @@
 
 class User {
  public:
-  int id;
-
-  User(int id) : id(id) {};
-
   virtual bool log_in(const std::string& username,
                          const std::string& email,
                          const std::string& password) const = 0;

@@ -23,7 +23,7 @@ void Bid::advance(bid_event e) {
   std::string request =
       (boost::format("UPDATE bids"
                      "SET state = %d"
-                     "WHERE id = %d") % st % bid_id).str();
+                     "WHERE id = %d") % st % id).str();
   rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
   sqlite3_close(db);
 }
