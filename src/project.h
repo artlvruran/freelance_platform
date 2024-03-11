@@ -17,19 +17,11 @@ class Project {
  public:
   int id;
   std::string name;
-  std::string description;
-  std::string timeline;
-  double budget;
-  std::unique_ptr<State> status = std::make_unique<Preparing>();
+  std::unique_ptr<State> status = std::make_unique<NotStarted>();
 
-  Project(std::string  name,
-          std::string  description,
-          std::string  timeline,
-          double budget) :
-          name(std::move(name)),
-          description(std::move(description)),
-          timeline(std::move(timeline)),
-          budget(budget) {};
+  Project(std::string  name) :
+          name(std::move(name))
+          {};
 
   void advance(event e);
 };
@@ -40,7 +32,6 @@ class LongTermJob : public Project {
 
 class Task : public Project {
   using Project::Project;
-
 };
 
 class Contest : public Project {

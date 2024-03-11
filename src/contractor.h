@@ -13,11 +13,17 @@
 class Contractor : public User {
  public:
   using User::User;
-  void add_project(const Project& project);
+  void add_project(Project& project);
   void consider_bid(Bid& bid, bid_event e);
   void fire_worker(const Project& project);
   void end_project(const Project& project);
-  void sign_up() const override;
+  void sign_up(const std::string& username,
+               const std::string& email,
+               const std::string& password) const override;
+
+  bool log_in(const std::string& username,
+               const std::string& email,
+               const std::string& password) const override;
 };
 
 #endif //FREELANCEPLATFORM_SRC_CONTRACTOR_H_

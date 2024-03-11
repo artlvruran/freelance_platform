@@ -20,7 +20,7 @@ void Project::advance(event e) {
   sqlite3_stmt *stmt;
   int rc;
   rc = sqlite3_open(db_source, &db);
-  int number = (e == event::start ? 0 : (e == event::hired ? 1 : 2));
+  int number = (e == event::start ? 1 : (e == event::hired ? 2 : 3));
 
   std::string find_request = (boost::format ("SELECT id from projects"
                                              "WHERE name = %s") % name).str();

@@ -12,6 +12,7 @@ struct Bid {
   int project_id;
   int employee_id;
   std::unique_ptr<BidState> status = std::make_unique<BidStateConsidering>();
+  void advance(bid_event e);
 };
 
 #endif //FREELANCEPLATFORM_SRC_BID_H_
