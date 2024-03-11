@@ -41,7 +41,7 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   rc = sqlite3_open(db_source, &db);
 
   std::string request =
-      (boost::format("SELECT project_id FROM bids WHERE id == %d") % bid.bid_id).str();
+      (boost::format("SELECT project_id FROM bids WHERE id == %d") % bid.id).str();
   rc = sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
   sqlite3_close(db);
 
