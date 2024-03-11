@@ -4,6 +4,13 @@
 #pragma once
 #include "state.h"
 
+std::unique_ptr<State> NotStarted::on_event(event e) {
+  if (e == event::start) {
+    return std::make_unique<Preparing>();
+  }
+  return nullptr;
+}
+
 std::unique_ptr<State> Preparing::on_event(event e) {
   if (e == event::hired) {
     return std::make_unique<Processing>();

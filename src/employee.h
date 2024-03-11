@@ -7,14 +7,20 @@
 
 #pragma once
 #include "user.h"
+#include "bid.h"
 
 class Employee : public User {
  public:
   using User::User;
-  std::vector<std::string> skills;
-  std::string bio;
-  int age;
-  void sign_up() const override;
+  void sign_up(const std::string& username,
+               const std::string& email,
+               const std::string& password) const override;
+
+  bool log_in(const std::string& username,
+               const std::string& email,
+               const std::string& password) const override;
+
+  Bid create_bid(int project_id);
 };
 
 #endif //FREELANCEPLATFORM_SRC_EMPLOYEE_H_

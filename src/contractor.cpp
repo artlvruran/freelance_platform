@@ -9,7 +9,9 @@
 #include <boost/format.hpp>
 #include <string>
 
-void Contractor::sign_up() const {
+void Contractor::sign_up(const std::string& username,
+                         const std::string& email,
+                         const std::string& password) const {
   sqlite3 *db;
   int rc;
   rc = sqlite3_open(db_source, &db);
@@ -19,55 +21,61 @@ void Contractor::sign_up() const {
   sqlite3_close(db);
 }
 
-void Contractor::consider_bid(Bid& bid, bid_event e) {
-  auto new_status = bid.status->on_event(e);
-  if (new_status != nullptr) {
-    bid.status = std::move(new_status);
-  }
-// Добавить проверку на то что заказчик курирует именно этот проект
+bool Contractor::log_in(const std::string& username,
+                        const std::string& email,
+                        const std::string& password) const {
   sqlite3 *db;
-  sqlite3_stmt *stmt;
   int rc;
   rc = sqlite3_open(db_source, &db);
-  std::string status = (e == bid_event::approve ? "approved" : "rejected");
-
-  std::string find_request = (boost::format ("SELECT id from bids"
-                                             "WHERE id = %d") % bid.bid_id).str();
-
-  rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Not found");
-  }
-  int id = sqlite3_column_int(stmt, 0);
-
   std::string request =
-      (boost::format("UPDATE bids"
-                     "SET status = %s"
-                     "WHERE id = %d") % status.c_str() % id).str();
-  rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
+      (boost::format("SELECT id FROM contractors WHERE username == '%s' AND email == '%s' AND password == '%s')") % username % email % password).str();
+  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   sqlite3_close(db);
+  return rc == SQLITE_OK;
 }
 
-void Contractor::add_project(const Project &project) {
+void Contractor::consider_bid(Bid& bid, bid_event e) {
+  sqlite3_stmt *stmt;
+  sqlite3 *db;
+  int rc;
+  rc = sqlite3_open(db_source, &db);
+
+  std::string request =
+      (boost::format("SELECT project_id FROM bids WHERE id == %d") % bid.bid_id).str();
+  rc = sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
+  sqlite3_close(db);
+
+  int project_id = sqlite3_column_int(stmt, 0);
+
+  request =
+      (boost::format("SELECT contractor_id FROM projects WHERE id == %d") % project_id).str();
+  rc = sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
+  sqlite3_close(db);
+
+  int contractor_id = sqlite3_column_int(stmt, 0);
+
+  if (contractor_id != id) {
+    throw std::runtime_error("Error in responsibility of contractor");
+  }
+
+  bid.advance(e);
+}
+
+void Contractor::add_project(Project &project) {
   sqlite3 *db;
   sqlite3_stmt *stmt;
   int rc;
   rc = sqlite3_open(db_source, &db);
-  std::string find_request = (boost::format ("SELECT id from contractors WHERE username = '%s'") % username).str();
-
-  rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Not found");
-  }
-  int id = sqlite3_column_int(stmt, 0);
 
   std::string request =
-      (boost::format("INSERT INTO projects ('name', 'description', 'contractor_id', 'state') VALUES ('%s', '%s', '%d', '%d')") % project.name % project.description % id % 0).str();
+      (boost::format("INSERT INTO projects ('name', 'contractor_id', 'state') VALUES ('%s', '%d', '%d')") % project.name % id % 0).str();
   rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   if (rc != SQLITE_OK) {
     throw std::runtime_error("Error in insertion project in db");
   }
   sqlite3_close(db);
+
+  project.advance(event::start);
 }
 
 void fire_worker(const Project& project, const Employee& employee) {
@@ -76,12 +84,7 @@ void fire_worker(const Project& project, const Employee& employee) {
   int rc;
   rc = sqlite3_open(db_source, &db);
 
-  std::string find_request = (boost::format ("SELECT id from employees WHERE username = '%s'") % employee.username).str();
-  rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Employee not found");
-  }
-  int employee_id = sqlite3_column_int(stmt, 0);
+  int employee_id = employee.id;
 
   std::string request =
       (boost::format("DELETE FROM bids WHERE employee_id = %d AND project_id = %d") % employee_id % project.id).str();
