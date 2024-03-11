@@ -31,8 +31,8 @@ class Contractor : public User {
 
   void add_project(Project& project);
   void consider_bid(Bid& bid, bid_event e);
-  void fire_worker(const Project& project);
-  void end_project(const Project& project);
+  void fire_worker(const Project& project, const Employee& employee);
+  void end_project(Project& project);
   void sign_up(const std::string& username,
                const std::string& email,
                const std::string& password) const override;
