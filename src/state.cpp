@@ -12,7 +12,7 @@ std::unique_ptr<State> NotStarted::on_event(event e) {
 }
 
 int NotStarted::integer() const {
-  return 0;
+  return 1;
 }
 
 std::unique_ptr<State> Preparing::on_event(event e) {
@@ -23,7 +23,7 @@ std::unique_ptr<State> Preparing::on_event(event e) {
 }
 
 int Preparing::integer() const {
-  return 1;
+  return 2;
 }
 
 std::unique_ptr<State> Processing::on_event(event e) {
@@ -34,7 +34,7 @@ std::unique_ptr<State> Processing::on_event(event e) {
 }
 
 int Processing::integer() const {
-  return 2;
+  return 3;
 }
 
 std::unique_ptr<State> Completed::on_event(event e) {
@@ -45,5 +45,5 @@ std::unique_ptr<State> Completed::on_event(event e) {
 }
 
 int Completed::integer() const {
-  return 3;
+  return 4;
 }

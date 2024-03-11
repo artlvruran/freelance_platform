@@ -62,37 +62,21 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
 }
 
 void Contractor::add_project(Project &project) {
-  sqlite3 *db;
-  sqlite3_stmt *stmt;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-
-  std::string request =
-      (boost::format("INSERT INTO projects ('name', 'contractor_id', 'state') VALUES ('%s', '%d', '%d')") % project.name % id % 0).str();
-  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Error in insertion project in db");
-  }
-  sqlite3_close(db);
-
-  project.advance(event::start);
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "insert into projects (name, contractor_id, state)"
+         "values(:name, :contractor_id, :state)", soci::use(project);
+  sql << "select id from projects "
+         "where name == :name", soci::use(project.name), soci::into(project.id);
 }
 
-void fire_worker(const Project& project, const Employee& employee) {
-  sqlite3 *db;
-  sqlite3_stmt *stmt;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-
-  int employee_id = employee.id;
-
-  std::string request =
-      (boost::format("DELETE FROM bids WHERE employee_id = %d AND project_id = %d") % employee_id % project.id).str();
-  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Error in deleting employee");
-  }
-  sqlite3_close(db);
+void Contractor::fire_worker(const Project& project, const Employee& employee) {
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "delete from bids "
+         "where employee_id == :id and project_id == :id1", soci::use(employee.id), soci::use(project.id);
 }
 
 void end_project(Project& project) {
