@@ -15,7 +15,7 @@ class Bid {
   int project_id;
 
   int employee_id;
-  std::unique_ptr<BidState> status = std::make_unique<BidStateConsidering>();
+  std::unique_ptr<BidState> state = std::make_unique<BidStateConsidering>();
   void advance(bid_event e);
  private:
 };
@@ -30,6 +30,17 @@ template<> struct type_conversion<Bid> {
       p.id = v.get<int>("id", 0);
       p.project_id = v.get<int>("project_id", 0);
       p.employee_id = v.get<int>("employee_id", 0);
+
+      auto st = v.get<std::string>("state", {});
+
+      if (st == "considering") {
+        p.state = std::make_unique<BidStateConsidering>();
+      } else if (st == "approved") {
+        p.state = std::make_unique<BidStateApproved>();
+      } else {
+        p.state = std::make_unique<BidStateRejected>();
+      }
+
     } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
   }
 
@@ -38,6 +49,7 @@ template<> struct type_conversion<Bid> {
       v.set("id", p.id);
       v.set("project_id", p.project_id);
       v.set("employee_id", p.employee_id);
+      v.set("state", p.state->str());
 
       ind = i_ok;
       return;

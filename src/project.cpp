@@ -10,11 +10,11 @@
 
 
 void Project::advance(event e) {
-  auto new_status = status->on_event(e);
+  auto new_status = state->on_event(e);
   if (new_status == nullptr) {
     throw std::runtime_error("event incorrect");
   }
-  status = std::move(new_status);
+  state = std::move(new_status);
 
   std::string src = "dbname=";
   src += db_source;
