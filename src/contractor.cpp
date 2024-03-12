@@ -51,8 +51,6 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   bid.advance(e);
 }
 
-//TODO: test
-
 void Contractor::add_project(Project &project) {
   std::string src = "dbname=";
   src += db_source;
@@ -87,6 +85,7 @@ void Contractor::register_observer(const User &user) const {
   sql << "insert into subscriptions (contractor_id, user_id)"
          "values(:id, :user_id)", soci::use(id), soci::use(user.id);
 }
+//TODO:test
 
 void Contractor::remove_observer(const User &user) const {
   std::string src = "dbname=";
@@ -109,11 +108,11 @@ void Contractor::notify_observers() const {
     if (role == "contractor") {
       Contractor contractor;
       sql << "select * from users where id = :id", soci::use(contractor);
-      //contractor.notify();
+      contractor.notify(id);
     } else {
       Employee employee;
       sql << "select * from users where id = :id", soci::use(employee);
-      //employee.notify();
+      employee.notify(id);
     }
   }
 }
