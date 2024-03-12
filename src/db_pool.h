@@ -34,9 +34,7 @@ class db_pool {
       soci::indicator ind;
       for (std::size_t _i = 0; _i < pool_size_; _i++) {
         soci::session& sql = pool_->at(_i);
-        // для каждой сессии открываем соединение с БД
         sql.open(conn_str);
-        // и проверяем простым запросом
         sql << "SELECT 1;", soci::into(is_connected, ind);
         if (!is_connected) break;
         else if (_i+1 < pool_size_) is_connected = 0;

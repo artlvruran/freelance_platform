@@ -14,13 +14,22 @@
 class User {
  public:
   int id;
-  virtual bool log_in(const std::string& username,
-                         const std::string& email,
-                         const std::string& password) const = 0;
+  std::string username;
+  std::string email;
+  std::string password;
 
-  virtual void sign_up(const std::string& username,
-                       const std::string& email,
-                       const std::string& password) const = 0;
+  User() = default;
+
+  User(std::string username,
+       std::string email,
+       std::string password) :
+      username(std::move(username)),
+      email(std::move(email)),
+      password(std::move(password)) {};
+
+  virtual bool log_in() = 0;
+
+  virtual void sign_up() = 0;
   void notify();
 };
 

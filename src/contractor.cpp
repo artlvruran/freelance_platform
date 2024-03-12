@@ -9,20 +9,18 @@
 #include <boost/format.hpp>
 #include <string>
 
-void Contractor::sign_up(const std::string& username,
-                         const std::string& email,
-                         const std::string& password) const {
+void Contractor::sign_up() {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
   sql << "insert into users (username, email, password, role) values(:username, :email, :password, 'contractor')", soci::use(*this);
+  int idd;
+  sql << "select id from users "
+         "  where username == :username", soci::into(idd), soci::use(username);
+  id = idd;
 }
 
-//TODO: test
-
-bool Contractor::log_in(const std::string& username,
-                        const std::string& email,
-                        const std::string& password) const {
+bool Contractor::log_in() {
   sqlite3 *db;
   int rc;
   rc = sqlite3_open(db_source, &db);
@@ -41,10 +39,10 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   src += db_source;
   soci::session sql("sqlite3", src);
   sql << "select contractor_id from projects"
-         "  where id = ("
+         "  where id == ("
          "               select project_id from bids"
-         "                  where id = :id"
-         ")", soci::use(contractor_id);
+         "                  where id == :id"
+         ")", soci::into(contractor_id), soci::use(bid.id);
 
   if (contractor_id != id) {
     throw std::runtime_error("Error in responsibility of contractor");
@@ -97,8 +95,8 @@ void Contractor::remove_observer(const User &user) const {
   sql << "delete from subscriptions "
          "where contractor_id == :id and user_id == :user_id", soci::use(id), soci::use(user.id);
 }
+//TODO: test
 
-//TODO
 void Contractor::notify_observers() const {
   std::string src = "dbname=";
   src += db_source;
@@ -119,3 +117,4 @@ void Contractor::notify_observers() const {
     }
   }
 }
+//TODO: test
