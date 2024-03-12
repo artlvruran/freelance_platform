@@ -8,14 +8,17 @@
 #include "src/constants.h"
 #include <iostream>
 #include <memory>
+#include <string>
 
 
 int main() {
-  Contractor ervin("john", "r", "r");
-  ervin.id = 2;
-  Bid bid;
-  bid.id = 1;
-  bid.employee_id = 3;
-  bid.project_id = 1;
-  ervin.consider_bid(bid, bid_event::approve);
+  Contractor john;
+  Employee hans;
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "select * from users where username == :username", soci::into(john), soci::use(std::string("john"));
+  sql << "select * from users where username == :username", soci::into(hans), soci::use(std::string("hans"));
+
+  john.remove_observer(hans);
 }
