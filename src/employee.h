@@ -12,7 +12,7 @@
 
 class Employee : public User {
  public:
-  int id;
+  using User::User;
 
   std::string username;
 

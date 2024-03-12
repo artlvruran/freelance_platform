@@ -12,7 +12,7 @@
 
 class Contractor : public User {
  public:
-  int id;
+  using User::User;
 
   std::string username;
 
@@ -41,6 +41,9 @@ class Contractor : public User {
               const std::string& email,
               const std::string& password) const override;
 
+
+  void register_observer(const User& user) const;
+  void remove_observer(const User &user) const;
  private:
 };
 
