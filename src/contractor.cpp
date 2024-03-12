@@ -100,5 +100,22 @@ void Contractor::remove_observer(const User &user) const {
 
 //TODO
 void Contractor::notify_observers() const {
-
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  soci::rowset<int> rs = (sql.prepare << "select user_id from subscriptions where contractor_id = :id", soci::use(id));
+  for (auto it = rs.begin(); it != rs.end(); ++it) {
+    int user_id = *it;
+    std::string role;
+    sql << "select role from users where id = :id", soci::use(user_id);
+    if (role == "contractor") {
+      Contractor contractor;
+      sql << "select * from users where id = :id", soci::use(contractor);
+      //contractor.notify();
+    } else {
+      Employee employee;
+      sql << "select * from users where id = :id", soci::use(employee);
+      //employee.notify();
+    }
+  }
 }

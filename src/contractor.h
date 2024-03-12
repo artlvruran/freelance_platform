@@ -9,6 +9,7 @@
 #include "user.h"
 #include "db_pool.h"
 #include "project.h"
+#include <string>
 
 class Contractor : public User {
  public:
@@ -44,6 +45,7 @@ class Contractor : public User {
 
   void register_observer(const User& user) const;
   void remove_observer(const User &user) const;
+  void notify_observers() const;
  private:
 };
 
@@ -67,7 +69,7 @@ namespace soci {
         v.set("username", p.username);
         v.set("email", p.email);
         v.set("password", p.password);
-
+        v.set("role", std::string("contractor"));
         ind = i_ok;
         return;
       } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
