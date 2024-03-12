@@ -21,6 +21,7 @@ class Contractor : public User {
   void consider_bid(Bid& bid, bid_event e);
   void fire_worker(const Project& project, const Employee& employee);
   void end_project(Project& project);
+  void end_project_hiring(Project& project);
   void sign_up() override;
 
   bool log_in() override;
