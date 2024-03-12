@@ -55,11 +55,12 @@ void Contractor::add_project(Project &project) {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << "insert into projects (name, contractor_id, state)"
-         "values(:name, :contractor_id, :state)", soci::use(project);
+  sql << (boost::format("insert into projects (name, contractor_id, state)"
+         "values(:name, %d, :state)") % id).str(), soci::use(project);
   sql << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
+  sql.close();
 }
 
 void Contractor::fire_worker(const Project& project, const Employee& employee) {
@@ -72,10 +73,12 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
 
 void Contractor::end_project(Project& project) {
   project.advance(event::completed);
+  notify_observers();
 }
 
 void Contractor::end_project_hiring(Project& project) {
   project.advance(event::hired);
+  notify_observers();
 }
 
 void Contractor::register_observer(const User &user) const {
@@ -92,6 +95,7 @@ void Contractor::remove_observer(const User &user) const {
   soci::session sql("sqlite3", src);
   sql << "delete from subscriptions "
          "where contractor_id == :id and user_id == :user_id", soci::use(id), soci::use(user.id);
+  sql.close();
 }
 
 void Contractor::notify_observers() const {
@@ -106,11 +110,16 @@ void Contractor::notify_observers() const {
     if (role == "contractor") {
       Contractor contractor;
       sql << "select * from users where id = :id", soci::use(contractor);
-      contractor.notify(id);
+      sql.close();
+      sql << "insert into notifications (contractor_id, user_id, is_read)"
+             "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(contractor.id);
+      //contractor.notify(id);
     } else {
       Employee employee;
       sql << "select * from users where id = :id", soci::use(employee);
-      employee.notify(id);
+      sql << "insert into notifications (contractor_id, user_id, is_read)"
+             "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(employee.id);
+      //employee.notify(id);
     }
   }
 }
