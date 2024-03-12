@@ -13,7 +13,7 @@ void Employee::sign_up(const std::string& username,
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << "insert into employees values(:username, :email, :password)", soci::use(*this);
+  sql << "insert into users values(:username, :email, :password, 'employee')", soci::use(*this);
 }
 // TODO: test
 
@@ -24,7 +24,7 @@ bool Employee::log_in(const std::string& username,
   int rc;
   rc = sqlite3_open(db_source, &db);
   std::string request =
-      (boost::format("SELECT id FROM employees WHERE username == '%s' AND email == '%s' AND password == '%s')") % username % email % password).str();
+      (boost::format("SELECT id FROM users WHERE username == '%s' AND email == '%s' AND password == '%s')") % username % email % password).str();
   rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   sqlite3_close(db);
   return rc == SQLITE_OK;
