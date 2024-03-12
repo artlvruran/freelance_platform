@@ -109,4 +109,3 @@ void Contractor::notify_observers() const {
            "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(user_id);
   }
 }
-//TODO: test
