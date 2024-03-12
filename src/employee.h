@@ -54,7 +54,7 @@ namespace soci {
         v.set("username", p.username);
         v.set("email", p.email);
         v.set("password", p.password);
-
+        v.set("role", std::string("employee"));
         ind = i_ok;
         return;
       } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
