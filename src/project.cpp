@@ -22,4 +22,5 @@ void Project::advance(event e) {
   sql << "update projects "
          "set state = :state "
          "where id = :id", soci::use(*this);
+  sql.close();
 }
