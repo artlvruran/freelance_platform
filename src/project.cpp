@@ -16,25 +16,10 @@ void Project::advance(event e) {
   }
   status = std::move(new_status);
 
-  sqlite3 *db;
-  sqlite3_stmt *stmt;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-  int number = (e == event::start ? 1 : (e == event::hired ? 2 : 3));
-
-  std::string find_request = (boost::format ("SELECT id from projects"
-                                             "WHERE name = %s") % name).str();
-
-  rc = sqlite3_prepare_v2(db, find_request.c_str(), -1, &stmt, nullptr);
-  if (rc != SQLITE_OK) {
-    throw std::runtime_error("Not found");
-  }
-  int id = sqlite3_column_int(stmt, 0);
-
-  std::string request =
-      (boost::format("UPDATE projects"
-                     "SET state = %d"
-                     "WHERE id = %d") % number % id).str();
-  rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
-  sqlite3_close(db);
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "update projects "
+         "set state = :state "
+         "where id = :id", soci::use(*this);
 }

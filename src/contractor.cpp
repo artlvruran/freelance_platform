@@ -69,6 +69,7 @@ void Contractor::add_project(Project &project) {
          "values(:name, :contractor_id, :state)", soci::use(project);
   sql << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
+  project.advance(event::start);
 }
 
 void Contractor::fire_worker(const Project& project, const Employee& employee) {
