@@ -14,21 +14,11 @@ class Employee : public User {
  public:
   using User::User;
 
-  std::string username;
-
-  std::string email;
-
-  std::string password;
-
   Employee() = default;
 
-  void sign_up(const std::string& username,
-               const std::string& email,
-               const std::string& password) const override;
+  void sign_up() override;
 
-  bool log_in(const std::string& username,
-               const std::string& email,
-               const std::string& password) const override;
+  bool log_in() override;
 
   Bid create_bid(int project_id);
  private:

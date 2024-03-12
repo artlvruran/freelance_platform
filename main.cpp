@@ -11,11 +11,7 @@
 
 
 int main() {
-  Project pr("kk");
-  Contractor John("john", "r", "r");
-  John.sign_up("john", "r", "r");
-  John.id = 1;
-  pr.contractor_id = 1;
-  John.add_project(pr);
-  pr.advance(event::hired);
+  Employee Hans("hans", "hans@mail.com", "h218dhei9ss");
+  Hans.id = 3;
+  Hans.create_bid(1);
 }
