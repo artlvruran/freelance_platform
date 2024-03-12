@@ -81,3 +81,24 @@ void end_project(Project& project) {
 void end_project_hiring(Project& project) {
   project.advance(event::hired);
 }
+
+void Contractor::register_observer(const User &user) const {
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "insert into subscriptions (contractor_id, user_id)"
+         "values(:id, :user_id)", soci::use(id), soci::use(user.id);
+}
+
+void Contractor::remove_observer(const User &user) const {
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "delete from subscriptions "
+         "where contractor_id == :id and user_id == :user_id", soci::use(id), soci::use(user.id);
+}
+
+//TODO
+void Contractor::notify_observers() const {
+
+}
