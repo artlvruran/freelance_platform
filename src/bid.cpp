@@ -21,4 +21,3 @@ void Bid::advance(bid_event e) {
          "set state = :state "
          "where id = :id", soci::use(*this);
 }
-//TODO: test

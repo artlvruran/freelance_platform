@@ -30,7 +30,7 @@ class User {
   virtual bool log_in() = 0;
 
   virtual void sign_up() = 0;
-  void notify();
+  void notify(int contractor_id);
 };
 
 #endif //FREELANCEPLATFORM_SRC_USER_H_

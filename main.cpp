@@ -11,7 +11,11 @@
 
 
 int main() {
-  Employee Hans("hans", "hans@mail.com", "h218dhei9ss");
-  Hans.id = 3;
-  Hans.create_bid(1);
+  Contractor ervin("john", "r", "r");
+  ervin.id = 2;
+  Bid bid;
+  bid.id = 1;
+  bid.employee_id = 3;
+  bid.project_id = 1;
+  ervin.consider_bid(bid, bid_event::approve);
 }
