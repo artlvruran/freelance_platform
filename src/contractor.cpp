@@ -70,11 +70,11 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
          "where employee_id == :id and project_id == :id1", soci::use(employee.id), soci::use(project.id);
 }
 
-void end_project(Project& project) {
+void Contractor::end_project(Project& project) {
   project.advance(event::completed);
 }
 
-void end_project_hiring(Project& project) {
+void Contractor::end_project_hiring(Project& project) {
   project.advance(event::hired);
 }
 
