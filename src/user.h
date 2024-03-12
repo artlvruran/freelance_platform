@@ -21,6 +21,7 @@ class User {
   virtual void sign_up(const std::string& username,
                        const std::string& email,
                        const std::string& password) const = 0;
+  void notify();
 };
 
 #endif //FREELANCEPLATFORM_SRC_USER_H_
