@@ -14,21 +14,25 @@ enum bid_event {
 
 struct BidState {
   virtual std::unique_ptr<BidState> on_event(bid_event e) = 0;
+  virtual std::string str() const = 0;
 };
 
 struct BidStateConsidering : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
+  std::string str() const;
 };
 
 struct BidStateApproved : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
+  std::string str() const;
 };
 
 struct BidStateRejected : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
+  std::string str() const;
 };
 
 #endif //FREELANCEPLATFORM_SRC_BID_STATE_H_

@@ -12,14 +12,13 @@
 void Contractor::sign_up(const std::string& username,
                          const std::string& email,
                          const std::string& password) const {
-  sqlite3 *db;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-  std::string request =
-      (boost::format("INSERT INTO contractors ('username', 'email', 'password') VALUES ('%s', '%s', '%s')") % username % email % password).str();
-  sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
-  sqlite3_close(db);
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "insert into contractors values(:username, :email, :password)", soci::use(*this);
 }
+
+//TODO: test
 
 bool Contractor::log_in(const std::string& username,
                         const std::string& email,
@@ -35,24 +34,17 @@ bool Contractor::log_in(const std::string& username,
 }
 
 void Contractor::consider_bid(Bid& bid, bid_event e) {
-  sqlite3_stmt *stmt;
-  sqlite3 *db;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
 
-  std::string request =
-      (boost::format("SELECT project_id FROM bids WHERE id == %d") % bid.id).str();
-  rc = sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
-  sqlite3_close(db);
+  int contractor_id;
 
-  int project_id = sqlite3_column_int(stmt, 0);
-
-  request =
-      (boost::format("SELECT contractor_id FROM projects WHERE id == %d") % project_id).str();
-  rc = sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
-  sqlite3_close(db);
-
-  int contractor_id = sqlite3_column_int(stmt, 0);
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "select contractor_id from projects"
+         "  where id = ("
+         "               select project_id from bids"
+         "                  where id = :id"
+         ")", soci::use(contractor_id);
 
   if (contractor_id != id) {
     throw std::runtime_error("Error in responsibility of contractor");
@@ -60,6 +52,8 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
 
   bid.advance(e);
 }
+
+//TODO: test
 
 void Contractor::add_project(Project &project) {
   std::string src = "dbname=";

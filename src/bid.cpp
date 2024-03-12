@@ -8,22 +8,17 @@
 #include <boost/format.hpp>
 
 void Bid::advance(bid_event e) {
-  auto new_status = status->on_event(e);
+  auto new_status = state->on_event(e);
   if (new_status == nullptr) {
     throw std::runtime_error("event incorrect");
   }
-  status = std::move(new_status);
+  state = std::move(new_status);
 
-  sqlite3 *db;
-  sqlite3_stmt *stmt;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-  std::string st = (e == bid_event::approve ? "approved" : "rejected");
-
-  std::string request =
-      (boost::format("UPDATE bids"
-                     "SET state = %d"
-                     "WHERE id = %d") % st % id).str();
-  rc = sqlite3_exec(db, request.c_str(), 0, 0, 0);
-  sqlite3_close(db);
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  sql << "update bids "
+         "set state = :state "
+         "where id = :id", soci::use(*this);
 }
+//TODO: test

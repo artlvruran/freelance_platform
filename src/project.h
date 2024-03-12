@@ -18,7 +18,7 @@ class Project {
   int id;
   int contractor_id;
   std::string name;
-  std::unique_ptr<State> status = std::make_unique<NotStarted>();
+  std::unique_ptr<State> state = std::make_unique<NotStarted>();
 
   Project() = default;
 
@@ -56,13 +56,13 @@ template<>
 
         int int_status = v.get<int>("state", 0);
         if (int_status == 1) {
-          p.status = std::make_unique<NotStarted>();
+          p.state = std::make_unique<NotStarted>();
         } else if (int_status == 2) {
-          p.status = std::make_unique<Preparing>();
+          p.state = std::make_unique<Preparing>();
         } else if (int_status == 3) {
-          p.status = std::make_unique<Processing>();
+          p.state = std::make_unique<Processing>();
         } else {
-          p.status = std::make_unique<Completed>();
+          p.state = std::make_unique<Completed>();
         }
 
       } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
@@ -72,7 +72,7 @@ template<>
       try {
         v.set("id", p.id);
         v.set("name", p.name);
-        v.set("state", p.status->integer());
+        v.set("state", p.state->integer());
         v.set("contractor_id", p.contractor_id);
 
         ind = i_ok;
