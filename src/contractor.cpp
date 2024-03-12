@@ -105,22 +105,8 @@ void Contractor::notify_observers() const {
   soci::rowset<int> rs = (sql.prepare << "select user_id from subscriptions where contractor_id = :id", soci::use(id));
   for (auto it = rs.begin(); it != rs.end(); ++it) {
     int user_id = *it;
-    std::string role;
-    sql << "select role from users where id = :id", soci::use(user_id);
-    if (role == "contractor") {
-      Contractor contractor;
-      sql << "select * from users where id = :id", soci::use(contractor);
-      sql.close();
-      sql << "insert into notifications (contractor_id, user_id, is_read)"
-             "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(contractor.id);
-      //contractor.notify(id);
-    } else {
-      Employee employee;
-      sql << "select * from users where id = :id", soci::use(employee);
-      sql << "insert into notifications (contractor_id, user_id, is_read)"
-             "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(employee.id);
-      //employee.notify(id);
-    }
+    sql << "insert into notifications (contractor_id, user_id, is_read)"
+           "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(user_id);
   }
 }
 //TODO: test
