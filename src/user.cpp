@@ -13,4 +13,3 @@ void User::notify(int contractor_id) {
   sql << "insert into notifications (contractor_id, user_id, is_read)"
          "  values(:contractor_id, :user_id, false)", soci::use(contractor_id), soci::use(id);
 }
-//TODO: test
