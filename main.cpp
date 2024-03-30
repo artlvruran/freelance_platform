@@ -46,6 +46,12 @@ class WebSite : public cppcms::application {
           employee.email = sgn.info.email.value();
           employee.password = sgn.info.password.value();
           employee.sign_up();
+        } else {
+          Contractor contractor;
+          contractor.username = sgn.info.username.value();
+          contractor.email = sgn.info.email.value();
+          contractor.password = sgn.info.password.value();
+          contractor.sign_up();
         }
       }
     }
