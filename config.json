@@ -1,0 +1,24 @@
+{
+  "WebSite" : {
+    "root" : "",
+    "host" : "localhost:8080",
+    "locdomain" : "localhost",
+  },
+  "service" : {
+    "ip"  : "0.0.0.0",
+    "api" : "http",
+    "port" : 8080
+  },
+  "http" : {
+    "script" : "/mb.fcgi" ,
+    "rewrite" : [
+      { "regex" : "/media(/.+)", "pattern" : "$1" },
+      { "regex" : ".*" , "pattern" : "/mb.fcgi$0" }
+    ],
+  },
+  "views" : {
+    "default_skin" : "defskin" ,
+    "paths" : [ "./" ],
+    "skins" : [ "cpp_defskin" ],
+  },
+}
