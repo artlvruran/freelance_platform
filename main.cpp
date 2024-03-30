@@ -40,6 +40,13 @@ class WebSite : public cppcms::application {
 
   virtual void signup(std::string path) {
     Data::Signup sgn;
+    sgn.page.title = path;
+    sgn.page.description = "description";
+    sgn.page.keywords = "keywords";
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+
     if (request().request_method() == "POST") {
       sgn.info.load(context());
       if (sgn.info.validate()) {
@@ -70,6 +77,13 @@ class WebSite : public cppcms::application {
 
   virtual void login(std::string path) {
     Data::Signup sgn;
+    sgn.page.title = path;
+    sgn.page.description = "description";
+    sgn.page.keywords = "keywords";
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+
     if (request().request_method() == "POST") {
       sgn.info.load(context());
       if (sgn.info.validate()) {
