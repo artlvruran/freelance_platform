@@ -14,19 +14,29 @@ namespace Data {
   struct infoForm : public cppcms::form {
     cppcms::widgets::text username;                        // титул страницы
     cppcms::widgets::text email;                   // описание страницы
-    cppcms::widgets::text password;
+    cppcms::widgets::text password;                 // описание страницы
+    cppcms::widgets::select role;
+    cppcms::widgets::submit submit;
 
     infoForm() {
-      username.message("your nickname");
-      email.message("your email");
-      password.message("your password");
+      username.message("Your nickname");
+      email.message("Your email");
+      password.message("Your password");
+      role.message("Your role");
+      submit.value("Submit");
 
       add(username);
       add(email);
       add(password);
+      add(role);
+      add(submit);
+
       username.non_empty();
       email.non_empty();
       password.non_empty();
+      role.add("employee");
+      role.add("contractor");
+      role.non_empty();
     }
   };
 

@@ -4,8 +4,11 @@
 #include <cppcms/application.h>
 #include <cppcms/url_mapper.h>
 #include <cppcms/service.h>
+#include <cppcms/application.h>
 #include "data/tmpl_master.h"
 #include "data/tmpl_signup.h"
+#include "src/employee.h"
+#include "src/contractor.h"
 
 class WebSite : public cppcms::application {
  public:
@@ -37,12 +40,16 @@ class WebSite : public cppcms::application {
     if (request().request_method() == "POST") {
       sgn.info.load(context());
       if (sgn.info.validate()) {
-        sgn.username = sgn.info.username.value();
-        sgn.email = sgn.info.email.value();
-        sgn.password = sgn.info.password.value();
-        sgn.info.clear();
+        if (sgn.info.role.selected_id() == "0") {
+          Employee employee;
+          employee.username = sgn.info.username.value();
+          employee.email = sgn.info.email.value();
+          employee.password = sgn.info.password.value();
+          employee.sign_up();
+        }
       }
     }
+
     render("Signup", sgn);
   }
 };
