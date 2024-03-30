@@ -26,7 +26,7 @@ done
 cp $INPUT/config.json $OUTPUT
 cp -R $INPUT/media $OUTPUT
 # сюда пишем все шаблоны
-TEMPLATES="$INPUT/templates/master.tmpl $INPUT/templates/signup.tmpl"
+TEMPLATES="$INPUT/templates/master.tmpl $INPUT/templates/signup.tmpl $INPUT/templates/projects.tmpl"
 
 # прожевываем шаблоны в срр-шник
 cppcms_tmpl_cc $TEMPLATES -o $INPUT/all_tmpl.cpp

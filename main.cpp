@@ -7,8 +7,10 @@
 #include <cppcms/application.h>
 #include "data/tmpl_master.h"
 #include "data/tmpl_signup.h"
+#include "data/tmpl_projects.h"
 #include "src/employee.h"
 #include "src/contractor.h"
+#include "src/constants.h"
 
 class WebSite : public cppcms::application {
  public:
@@ -18,6 +20,9 @@ class WebSite : public cppcms::application {
 
     dispatcher().assign("/login", &WebSite::login, this, 1);
     mapper().assign("login");
+
+    dispatcher().assign("/projects", &WebSite::projects, this, 1);
+    mapper().assign("/projects");
 
     dispatcher().assign("(/?)", &WebSite::master, this, 1);
     mapper().assign("/");
@@ -119,6 +124,28 @@ class WebSite : public cppcms::application {
     }
 
     render("Signup", sgn);
+  }
+
+  virtual void projects(std::string path) {
+    Data::Projects mn;
+
+    mn.page.title = path;
+    mn.page.description = "description";
+    mn.page.keywords = "keywords";
+    mn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
+    mn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
+    mn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    soci::rowset<Project> projects = (sql.prepare << "select * from projects");
+    std::vector<Project> all_projects;
+    for (auto it = projects.begin(); it != projects.end(); ++it) {
+      all_projects.push_back(*it);
+    }
+    mn.projects_page.projects = all_projects;
+    render("Projects", mn);
   }
 };
 
