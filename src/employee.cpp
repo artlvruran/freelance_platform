@@ -19,7 +19,7 @@ bool Employee::log_in() {
   int rc;
   rc = sqlite3_open(db_source, &db);
   std::string request =
-      (boost::format("SELECT id FROM users WHERE username == '%s' AND email == '%s' AND password == '%s')") % username % email % password).str();
+      (boost::format("SELECT id FROM users WHERE username == '%s' AND email == '%s' AND password == '%s' AND role == 'employee'") % username % email % password).str();
   rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
   sqlite3_close(db);
   return rc == SQLITE_OK;

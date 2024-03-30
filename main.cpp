@@ -60,7 +60,7 @@ class WebSite : public cppcms::application {
         session().set("email", sgn.info.email.value());
         session().set("password", sgn.info.password.value());
         session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
-        master(path);
+        response().set_redirect_header("/");
         return;
       }
     }
@@ -78,13 +78,13 @@ class WebSite : public cppcms::application {
           employee.username = sgn.info.username.value();
           employee.email = sgn.info.email.value();
           employee.password = sgn.info.password.value();
-          employee.sign_up();
           if (employee.log_in()) {
             session().set("username", sgn.info.username.value());
             session().set("email", sgn.info.email.value());
             session().set("password", sgn.info.password.value());
             session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
-            master(path);
+
+            response().set_redirect_header("/");
             return;
           }
         } else {
@@ -92,13 +92,12 @@ class WebSite : public cppcms::application {
           contractor.username = sgn.info.username.value();
           contractor.email = sgn.info.email.value();
           contractor.password = sgn.info.password.value();
-          contractor.sign_up();
           if (contractor.log_in()) {
             session().set("username", sgn.info.username.value());
             session().set("email", sgn.info.email.value());
             session().set("password", sgn.info.password.value());
             session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
-            master(path);
+            response().set_redirect_header("/");
             return;
           }
         }
