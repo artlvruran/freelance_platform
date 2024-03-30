@@ -23,7 +23,8 @@ add_executable(FreelancePlatform main.cpp
         src/bid.cpp
         src/db_pool.h
         src/user.cpp
-        data/tmpl_master.h)
+        data/tmpl_master.h
+        data/tmpl_signup.h)
 add_compile_options(-l sqlite3)
 add_compile_options(-l soci_sqlite3)
 add_compile_options(-l soci_core)

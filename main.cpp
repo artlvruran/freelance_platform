@@ -5,22 +5,47 @@
 #include <cppcms/url_mapper.h>
 #include <cppcms/service.h>
 #include "data/tmpl_master.h"
+#include "data/tmpl_signup.h"
 
 class WebSite : public cppcms::application {
  public:
-  WebSite(cppcms::service& s) : cppcms::application(s) {};
+  WebSite(cppcms::service& s) : cppcms::application(s) {
+    dispatcher().assign("/signup", &WebSite::signup, this, 1);
+    mapper().assign("signup");
+
+    dispatcher().assign("(/?)", &WebSite::master, this, 1);
+    mapper().assign("/");
+  };
 
   virtual void main(std::string path) {
+    cppcms::application::main(path);
+  }
+
+  virtual void master(std::string path) {
     Data::Master tmpl;
     tmpl.page.title = path;
     tmpl.page.description = "description";
     tmpl.page.keywords = "keywords";
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/","MAIN"));
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/else","ELSE"));
+    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
+    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
+    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));\
     render("Master",tmpl);
   }
-};
 
+  virtual void signup(std::string path) {
+    Data::Signup sgn;
+    if (request().request_method() == "POST") {
+      sgn.info.load(context());
+      if (sgn.info.validate()) {
+        sgn.username = sgn.info.username.value();
+        sgn.email = sgn.info.email.value();
+        sgn.password = sgn.info.password.value();
+        sgn.info.clear();
+      }
+    }
+    render("Signup", sgn);
+  }
+};
 
 int main(int argc, char** argv) {
   try {
