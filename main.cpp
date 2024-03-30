@@ -16,6 +16,9 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/signup", &WebSite::signup, this, 1);
     mapper().assign("signup");
 
+    dispatcher().assign("/login", &WebSite::login, this, 1);
+    mapper().assign("login");
+
     dispatcher().assign("(/?)", &WebSite::master, this, 1);
     mapper().assign("/");
   };
@@ -31,7 +34,7 @@ class WebSite : public cppcms::application {
     tmpl.page.keywords = "keywords";
     tmpl.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
     tmpl.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));\
+    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
     render("Master",tmpl);
   }
 
@@ -52,6 +55,52 @@ class WebSite : public cppcms::application {
           contractor.email = sgn.info.email.value();
           contractor.password = sgn.info.password.value();
           contractor.sign_up();
+        }
+        session().set("username", sgn.info.username.value());
+        session().set("email", sgn.info.email.value());
+        session().set("password", sgn.info.password.value());
+        session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
+        master(path);
+        return;
+      }
+    }
+
+    render("Signup", sgn);
+  }
+
+  virtual void login(std::string path) {
+    Data::Signup sgn;
+    if (request().request_method() == "POST") {
+      sgn.info.load(context());
+      if (sgn.info.validate()) {
+        if (sgn.info.role.selected_id() == "0") {
+          Employee employee;
+          employee.username = sgn.info.username.value();
+          employee.email = sgn.info.email.value();
+          employee.password = sgn.info.password.value();
+          employee.sign_up();
+          if (employee.log_in()) {
+            session().set("username", sgn.info.username.value());
+            session().set("email", sgn.info.email.value());
+            session().set("password", sgn.info.password.value());
+            session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
+            master(path);
+            return;
+          }
+        } else {
+          Contractor contractor;
+          contractor.username = sgn.info.username.value();
+          contractor.email = sgn.info.email.value();
+          contractor.password = sgn.info.password.value();
+          contractor.sign_up();
+          if (contractor.log_in()) {
+            session().set("username", sgn.info.username.value());
+            session().set("email", sgn.info.email.value());
+            session().set("password", sgn.info.password.value());
+            session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
+            master(path);
+            return;
+          }
         }
       }
     }
