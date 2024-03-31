@@ -25,12 +25,12 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/logout", &WebSite::log_out, this);
     mapper().assign("logout");
 
+    dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
+    mapper().assign("/projects/bid_on/{1}");
 
     dispatcher().assign("/projects/(.+)/(.+)", &WebSite::consider, this, 1, 2);
     mapper().assign("/projects/bid_on/{1}/{2}");
 
-    dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
-    mapper().assign("/projects/bid_on/{1}");
 
     dispatcher().assign("/projects/(.+)", &WebSite::project, this, 1);
     mapper().assign("/projects/{1}");
@@ -169,13 +169,14 @@ class WebSite : public cppcms::application {
       if (session()["role"] == "employee") {
         pr.project_page.is_employee = true;
         soci::indicator ind;
-        int bid_id;
-        sql << "select id from bids where project_id=:project_id and employee_id=("
+        Bid bid;
+        sql << "select * from bids where project_id=:project_id and employee_id=("
                "select id from users where role='employee' and username=:username"
                ")",
-            soci::use(id), soci::use(session()["username"]), soci::into(id, ind);
+            soci::use(id), soci::use(session()["username"]), soci::into(bid, ind);
         if (sql.got_data() && ind == soci::i_ok) {
           pr.project_page.is_bid_created = true;
+          pr.project_page.bids.push_back(bid);
         }
       } else {
         pr.project_page.is_employee = false;

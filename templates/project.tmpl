@@ -37,7 +37,13 @@
         </h1>
         <% if (content.project_page.is_employee) %>
             <% if (content.project_page.is_bid_created) %>
-                <button type="button" class="btn btn-outline-success" disabled>Bid is created</button>
+                <% if (content.project_page.bids[0].state->str() == "approved") %>
+                    <button type="button" class="btn btn-outline-success" disabled>Approved</button>
+                <% elif (content.project_page.bids[0].state->str() == "rejected") %>
+                    <button type="button" class="btn btn-outline-danger" disabled>Rejected</button>
+                <% else %>
+                    <button type="button" class="btn btn-outline-warning" disabled>Considering</button>
+                <% end %>
             <% else %>
                 <a role="button" class="btn btn-success" href="/projects/bid_on/<%= project_page.project.id %>"> Bid on </a>
             <% end %>
