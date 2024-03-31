@@ -1,6 +1,6 @@
-<% c++ #include "data/tmpl_signup.h" %>
+<% c++ #include "data/tmpl_add_project.h" %>
 <% skin defskin %>
-<% view Signup uses Data::Signup %>
+<% view AddProject uses Data::AddProject %>
 <% template page_main() %><% end %>
 <% template page_footer() %><% end %>
 <% template page_left_sidebar() %><% end %>
@@ -37,7 +37,7 @@
             </div>
         </header>
     <form action="" method="post" >
-    <% form as_p info %>
+    <% form as_p add_project_form %>
     </form>
 </div>
 <footer class="footer"><% include page_footer() %></footer>

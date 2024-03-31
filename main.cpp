@@ -9,6 +9,7 @@
 #include "data/tmpl_signup.h"
 #include "data/tmpl_projects.h"
 #include "data/tmpl_project.h"
+#include "data/tmpl_add_project.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
@@ -28,9 +29,11 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 
+    dispatcher().assign("/projects/add_project", &WebSite::add_project, this);
+    mapper().assign("/projects/add_project");
+
     dispatcher().assign("/projects/(.+)/(.+)", &WebSite::consider, this, 1, 2);
     mapper().assign("/projects/bid_on/{1}/{2}");
-
 
     dispatcher().assign("/projects/(.+)", &WebSite::project, this, 1);
     mapper().assign("/projects/{1}");
@@ -47,14 +50,20 @@ class WebSite : public cppcms::application {
   }
 
   template<typename T>
-  static void add_menu(T& object) {
+  void add_menu(T& object) {
     object.page.description = "description";
     object.page.keywords = "keywords";
+    if (session().is_set("username")) {
+      object.page.current_username = session()["username"];
+    }
     object.page.menuList.push_back(std::pair<std::string,std::string>("/","Main"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/projects","Projects"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
+    if (session().is_set("role") && session()["role"] == "contractor") {
+      object.page.menuList.push_back(std::pair<std::string, std::string>("/projects/add_project", "Add Project"));
+    }
   }
 
   virtual void master() {
@@ -264,6 +273,37 @@ class WebSite : public cppcms::application {
       }
     }
     response().set_redirect_header("/");
+  }
+
+  virtual void add_project() {
+    Data::AddProject addpr;
+    add_menu(addpr);
+
+    if (request().request_method() == "POST") {
+      addpr.add_project_form.load(context());
+      if (addpr.add_project_form.validate()) {
+        if (session().is_set("role") && session()["role"] == "contractor") {
+          Contractor contractor;
+          Project project;
+          project.name = addpr.add_project_form.name.value();
+
+          std::string src = "dbname=";
+          src += db_source;
+          soci::session sql("sqlite3", src);
+          sql << "select * from users where role='contractor' and username=:username",
+                  soci::use(session()["username"]), soci::into(contractor);
+
+          contractor.add_project(project);
+
+          response().set_redirect_header("/projects");
+          return;
+        }
+        response().set_redirect_header("/");
+        return;
+      }
+    }
+
+    render("AddProject", addpr);
   }
 };
 

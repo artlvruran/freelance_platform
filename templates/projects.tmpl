@@ -27,6 +27,11 @@
                             </li>
                         <% end %>
                     <% end %>
+                    <li class="nav-item active">
+                        <a class="nav-link">
+                            <%= page.current_username %>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -35,10 +40,14 @@
         <div class="row">
             <% foreach project in projects_page.projects %>
                 <% item %>
-                <div class="card" style="width: 33.33333%">
-                    <a class="nav-link" href="/projects/<%= project.id %>">
-                        <%= project.name %>
-                    </a>
+                <div class="card mb-3" style="width: 30%; height: 100px; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
+                    <div class="card-header">
+                        <h2>
+                        <a class="nav-link" href="/projects/<%= project.id %>">
+                            <%= project.name %>
+                        </a>
+                        </h2>
+                    </div>
                 </div>
                 <% end %>
             <% end %>

@@ -41,7 +41,6 @@ namespace Data {
   };
 
   struct Signup : public Master {
-    std::string username, email, password;
     Data::infoForm info;
   };
 }
