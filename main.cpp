@@ -8,6 +8,7 @@
 #include "data/tmpl_master.h"
 #include "data/tmpl_signup.h"
 #include "data/tmpl_projects.h"
+#include "data/tmpl_project.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
@@ -15,16 +16,22 @@
 class WebSite : public cppcms::application {
  public:
   WebSite(cppcms::service& s) : cppcms::application(s) {
-    dispatcher().assign("/signup", &WebSite::signup, this, 1);
+    dispatcher().assign("/signup", &WebSite::signup, this);
     mapper().assign("signup");
 
-    dispatcher().assign("/login", &WebSite::login, this, 1);
+    dispatcher().assign("/login", &WebSite::login, this);
     mapper().assign("login");
 
-    dispatcher().assign("/projects", &WebSite::projects, this, 1);
+    dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
+    mapper().assign("/projects/bid_on/{1}");
+
+    dispatcher().assign("/projects/(.+)", &WebSite::project, this, 1);
+    mapper().assign("/projects/{1}");
+
+    dispatcher().assign("/projects", &WebSite::projects, this);
     mapper().assign("/projects");
 
-    dispatcher().assign("(/?)", &WebSite::master, this, 1);
+    dispatcher().assign("/", &WebSite::master, this);
     mapper().assign("/");
   };
 
@@ -32,25 +39,25 @@ class WebSite : public cppcms::application {
     cppcms::application::main(path);
   }
 
-  virtual void master(std::string path) {
+  virtual void master() {
     Data::Master tmpl;
-    tmpl.page.title = path;
     tmpl.page.description = "description";
     tmpl.page.keywords = "keywords";
     tmpl.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
     tmpl.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
     tmpl.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
     render("Master",tmpl);
   }
 
-  virtual void signup(std::string path) {
+  virtual void signup() {
     Data::Signup sgn;
-    sgn.page.title = path;
     sgn.page.description = "description";
     sgn.page.keywords = "keywords";
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
 
     if (request().request_method() == "POST") {
       sgn.info.load(context());
@@ -80,14 +87,14 @@ class WebSite : public cppcms::application {
     render("Signup", sgn);
   }
 
-  virtual void login(std::string path) {
+  virtual void login() {
     Data::Signup sgn;
-    sgn.page.title = path;
     sgn.page.description = "description";
     sgn.page.keywords = "keywords";
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
     sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+    sgn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
 
     if (request().request_method() == "POST") {
       sgn.info.load(context());
@@ -126,15 +133,15 @@ class WebSite : public cppcms::application {
     render("Signup", sgn);
   }
 
-  virtual void projects(std::string path) {
+  virtual void projects() {
     Data::Projects mn;
 
-    mn.page.title = path;
     mn.page.description = "description";
     mn.page.keywords = "keywords";
     mn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
     mn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
     mn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+    mn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
 
     std::string src = "dbname=";
     src += db_source;
@@ -146,6 +153,66 @@ class WebSite : public cppcms::application {
     }
     mn.projects_page.projects = all_projects;
     render("Projects", mn);
+  }
+
+  virtual void project(std::string id) {
+    Data::SingleProject pr;
+
+    pr.page.description = "description";
+    pr.page.keywords = "keywords";
+    pr.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
+    pr.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
+    pr.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
+    pr.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    Project project;
+    sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+
+    pr.project_page.project = project;
+    if (session().is_set("role")) {
+      if (session()["role"] == "employee") {
+        pr.project_page.is_employee = true;
+        soci::indicator ind;
+        int bid_id;
+        sql << "select id from bids where project_id=:project_id and employee_id=("
+               "select id from users where role='employee' and username=:username"
+               ")",
+            soci::use(id), soci::use(session()["username"]), soci::into(id, ind);
+        if (sql.got_data() && ind == soci::i_ok) {
+          pr.project_page.is_bid_created = true;
+        }
+      } else {
+        pr.project_page.is_employee = false;
+      }
+    }
+    render("SingleProject", pr);
+  }
+
+  virtual void bid_on(std::string id) {
+    if (session().is_set("role")) {
+      if (session()["role"] == "employee") {
+        std::string src = "dbname=";
+        src += db_source;
+        soci::session sql("sqlite3", src);
+        Project project;
+        sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+
+        Employee employee;
+        sql << "select * from users where role='employee' and username=:username",
+              soci::use(session()["username"]), soci::into(employee);
+
+        employee.create_bid(project.id);
+
+        response().set_redirect_header("/projects/" + id);
+        return;
+      } else {
+        response().set_redirect_header("/projects/" + id);
+        return;
+      }
+    }
   }
 };
 
