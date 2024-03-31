@@ -29,7 +29,7 @@ class Contractor : public User {
 
   void register_observer(const User& user) const;
   void remove_observer(const User &user) const;
-  void notify_observers() const;
+  void notify_observers(std::string description) const;
  private:
 };
 

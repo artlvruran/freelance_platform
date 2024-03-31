@@ -1,8 +1,6 @@
 //
 // Created by kirill on 26.02.24.
 //
-
-#pragma once
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"
@@ -60,6 +58,7 @@ void Contractor::add_project(Project &project) {
   sql << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
+  notify_observers("Project " + project.name + " has been created.");
   sql.close();
 }
 
@@ -73,12 +72,12 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
 
 void Contractor::end_project(Project& project) {
   project.advance(event::completed);
-  notify_observers();
+  notify_observers("Project " + project.name + " has ended.");
 }
 
 void Contractor::end_project_hiring(Project& project) {
   project.advance(event::hired);
-  notify_observers();
+  notify_observers("Project " + project.name + " has finished its hiring.");
 }
 
 void Contractor::register_observer(const User &user) const {
@@ -98,14 +97,14 @@ void Contractor::remove_observer(const User &user) const {
   sql.close();
 }
 
-void Contractor::notify_observers() const {
+void Contractor::notify_observers(std::string description) const {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
   soci::rowset<int> rs = (sql.prepare << "select user_id from subscriptions where contractor_id = :id", soci::use(id));
   for (auto it = rs.begin(); it != rs.end(); ++it) {
     int user_id = *it;
-    sql << "insert into notifications (contractor_id, user_id, is_read)"
-           "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(user_id);
+    sql << "insert into notifications (contractor_id, user_id, is_read, description)"
+           "  values(:contractor_id, :user_id, false, :description)", soci::use(id), soci::use(user_id), soci::use(description);
   }
 }

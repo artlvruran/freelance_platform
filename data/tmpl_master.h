@@ -6,6 +6,8 @@
 #define FREELANCEPLATFORM_DATA_TMPL_MASTER_H_
 
 #include <cppcms/view.h>
+#include "../src/user.h"
+
 namespace Data {
   struct infoPage {
     std::string title;
@@ -13,6 +15,7 @@ namespace Data {
     std::string keywords;
     std::vector<std::pair<std::string,std::string>> menuList;
     std::string current_username;
+    std::vector<std::pair<int, std::string>> notifications;
 
     infoPage() :
         title      (""),

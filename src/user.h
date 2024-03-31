@@ -31,6 +31,7 @@ class User {
 
   virtual void sign_up() = 0;
   void notify(int contractor_id);
+  static void read(int notification_id);
 };
 
 #endif //FREELANCEPLATFORM_SRC_USER_H_

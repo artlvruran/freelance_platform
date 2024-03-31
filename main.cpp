@@ -73,6 +73,52 @@ class WebSite : public cppcms::application {
   virtual void master() {
     Data::Master tmpl;
     add_menu(tmpl);
+
+
+    if (session().is_set("username")) {
+      if (request().request_method() == "POST") {
+        std::string paramlist = request().query_string();
+        int notification_id = std::stoi(paramlist.substr(11, paramlist.size() - 10));
+
+        std::string src = "dbname=";
+        src += db_source;
+        soci::session sql("sqlite3", src);
+
+        int user_id;
+        sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
+
+        int not_user_id;
+        sql << "select user_id from notifications where id=:id", soci::use(notification_id), soci::into(not_user_id);
+
+        if (user_id == not_user_id) {
+          User::read(notification_id);
+        }
+        response().set_redirect_header("/");
+        return;
+      }
+    }
+
+    if (session().is_set("username")) {
+      std::vector<std::pair<int, std::string>> notifications;
+
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+
+      int user_id;
+      sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
+
+      soci::rowset<soci::row> nots = (sql.prepare << "select * from notifications where user_id=:user_id" , soci::use(user_id));
+      for (auto &it : nots) {
+        if (!it.get<int>("is_read")) {
+          notifications.push_back({it.get<int>("id"), it.get<std::string>("description")});
+        }
+      }
+
+      tmpl.page.notifications = notifications;
+
+    }
+
     render("Master",tmpl);
   }
 
@@ -329,11 +375,11 @@ class WebSite : public cppcms::application {
 
         if (contractor_id == contractor.id) {
           if (project.state->integer() == 0) {
-            project.advance(event::start);
+            contractor.add_project(project);
           } else if (project.state->integer() == 1) {
-            project.advance(event::hired);
+            contractor.end_project_hiring(project);
           } else {
-            project.advance(event::completed);
+            contractor.end_project(project);
           }
           response().set_redirect_header("/projects/" + id);
           return;
