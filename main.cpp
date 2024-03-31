@@ -22,6 +22,13 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/login", &WebSite::login, this);
     mapper().assign("login");
 
+    dispatcher().assign("/logout", &WebSite::log_out, this);
+    mapper().assign("logout");
+
+
+    dispatcher().assign("/projects/(.+)/(.+)", &WebSite::consider, this, 1, 2);
+    mapper().assign("/projects/bid_on/{1}/{2}");
+
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 
@@ -39,25 +46,26 @@ class WebSite : public cppcms::application {
     cppcms::application::main(path);
   }
 
+  template<typename T>
+  static void add_menu(T& object) {
+    object.page.description = "description";
+    object.page.keywords = "keywords";
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/","Main"));
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/projects","Projects"));
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
+  }
+
   virtual void master() {
     Data::Master tmpl;
-    tmpl.page.description = "description";
-    tmpl.page.keywords = "keywords";
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
-    tmpl.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+    add_menu(tmpl);
     render("Master",tmpl);
   }
 
   virtual void signup() {
     Data::Signup sgn;
-    sgn.page.description = "description";
-    sgn.page.keywords = "keywords";
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+    add_menu(sgn);
 
     if (request().request_method() == "POST") {
       sgn.info.load(context());
@@ -89,12 +97,7 @@ class WebSite : public cppcms::application {
 
   virtual void login() {
     Data::Signup sgn;
-    sgn.page.description = "description";
-    sgn.page.keywords = "keywords";
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
-    sgn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+    add_menu(sgn);
 
     if (request().request_method() == "POST") {
       sgn.info.load(context());
@@ -136,12 +139,7 @@ class WebSite : public cppcms::application {
   virtual void projects() {
     Data::Projects mn;
 
-    mn.page.description = "description";
-    mn.page.keywords = "keywords";
-    mn.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
-    mn.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    mn.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
-    mn.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+    add_menu(mn);
 
     std::string src = "dbname=";
     src += db_source;
@@ -158,12 +156,7 @@ class WebSite : public cppcms::application {
   virtual void project(std::string id) {
     Data::SingleProject pr;
 
-    pr.page.description = "description";
-    pr.page.keywords = "keywords";
-    pr.page.menuList.insert(std::pair<std::string,std::string>("/","Main"));
-    pr.page.menuList.insert(std::pair<std::string,std::string>("/signup","Sign Up"));
-    pr.page.menuList.insert(std::pair<std::string,std::string>("/login","Log in"));
-    pr.page.menuList.insert(std::pair<std::string,std::string>("/projects","Projects"));
+    add_menu(pr);
 
     std::string src = "dbname=";
     src += db_source;
@@ -186,6 +179,20 @@ class WebSite : public cppcms::application {
         }
       } else {
         pr.project_page.is_employee = false;
+
+        int contractor_id;
+        sql << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
+
+        Contractor contractor;
+        sql << "select * from users where role='contractor' and username=:username",
+              soci::use(session()["username"]), soci::into(contractor);
+
+        if (contractor_id == contractor.id) {
+          soci::rowset<Bid> rs = (sql.prepare << "select * from bids where project_id = :id", soci::use(id));
+          for (auto& bid : rs) {
+            pr.project_page.bids.push_back(bid);
+          }
+        }
       }
     }
     render("SingleProject", pr);
@@ -213,6 +220,49 @@ class WebSite : public cppcms::application {
         return;
       }
     }
+  }
+
+  virtual void log_out() {
+    session().erase("username");
+    session().erase("email");
+    session().erase("password");
+    session().erase("role");
+    response().set_redirect_header("/");
+  }
+
+  virtual void consider(std::string bid_id, std::string status) {
+    if (session().is_set("role")) {
+      if (session()["role"] == "employee") {
+        response().set_redirect_header("/projects");
+        return;
+      } else {
+        int contractor_id;
+
+        std::string src = "dbname=";
+        src += db_source;
+        soci::session sql("sqlite3", src);
+        sql << "select contractor_id from projects where id=("
+               "select project_id from bids where id=:bid_id"
+               ")", soci::use(bid_id), soci::into(contractor_id);
+
+        Contractor contractor;
+        sql << "select * from users where role='contractor' and username=:username",
+            soci::use(session()["username"]), soci::into(contractor);
+        if (contractor_id == contractor.id) {
+          Bid bid;
+          sql << "select * from bids where id=:bid_id", soci::use(bid_id), soci::into(bid);
+          contractor.consider_bid(bid, (status == "approve" ? bid_event::approve : bid_event::reject));
+          int project_id;
+          sql << "select project_id from bids where id=:bid_id",
+                soci::use(bid_id), soci::into(project_id);
+          response().set_redirect_header("/projects/" + std::to_string(project_id));
+          return;
+        }
+        response().set_redirect_header("/");
+        return;
+      }
+    }
+    response().set_redirect_header("/");
   }
 };
 

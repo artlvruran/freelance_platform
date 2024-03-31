@@ -25,14 +25,10 @@ bool Employee::log_in() {
   return rc == SQLITE_OK;
 }
 
-Bid Employee::create_bid(int project_id) {
+void Employee::create_bid(int project_id) {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
   sql << "insert into bids (project_id, employee_id, state) "
          "values(:project_id, :employee_id, 'considering')", soci::use(project_id), soci::use(id);
-  int bid_id;
-  sql << "select count(*) from bids ", soci::into(bid_id);
-  Bid bid{bid_id, id, project_id};
-  return bid;
 }

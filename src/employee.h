@@ -20,7 +20,7 @@ class Employee : public User {
 
   bool log_in() override;
 
-  Bid create_bid(int project_id);
+  void create_bid(int project_id);
  private:
 };
 
