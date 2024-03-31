@@ -31,11 +31,11 @@ class Project {
           contractor_id(other.contractor_id),
           name(other.name)
   {
-    if (other.state->integer() == 1) {
+    if (other.state->integer() == 0) {
       state = std::make_unique<NotStarted>();
-    } else if (other.state->integer() == 2) {
+    } else if (other.state->integer() == 1) {
       state = std::make_unique<Preparing>();
-    } else if (other.state->integer() == 3) {
+    } else if (other.state->integer() == 2) {
       state = std::make_unique<Processing>();
     } else {
       state = std::make_unique<Completed>();
@@ -46,11 +46,11 @@ class Project {
     id = other.id;
     contractor_id = other.contractor_id;
     name = other.name;
-    if (other.state->integer() == 1) {
+    if (other.state->integer() == 0) {
       state = std::make_unique<NotStarted>();
-    } else if (other.state->integer() == 2) {
+    } else if (other.state->integer() == 1) {
       state = std::make_unique<Preparing>();
-    } else if (other.state->integer() == 3) {
+    } else if (other.state->integer() == 2) {
       state = std::make_unique<Processing>();
     } else {
       state = std::make_unique<Completed>();
@@ -87,11 +87,11 @@ template<>
         p.contractor_id = v.get<int>("contractor_id", 0);
 
         int int_status = v.get<int>("state", 0);
-        if (int_status == 1) {
+        if (int_status == 0) {
           p.state = std::make_unique<NotStarted>();
-        } else if (int_status == 2) {
+        } else if (int_status == 1) {
           p.state = std::make_unique<Preparing>();
-        } else if (int_status == 3) {
+        } else if (int_status == 2) {
           p.state = std::make_unique<Processing>();
         } else {
           p.state = std::make_unique<Completed>();

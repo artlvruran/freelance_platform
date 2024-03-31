@@ -26,6 +26,10 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/logout", &WebSite::log_out, this);
     mapper().assign("logout");
 
+
+    dispatcher().assign("/projects/advance/(.+)", &WebSite::advance, this, 1);
+    mapper().assign("/projects/advance/{1}");
+
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 
@@ -304,6 +308,42 @@ class WebSite : public cppcms::application {
     }
 
     render("AddProject", addpr);
+  }
+
+  virtual void advance(std::string id) {
+    if (session().is_set("role")) {
+      if (session()["role"] == "contractor") {
+
+        std::string src = "dbname=";
+        src += db_source;
+        soci::session sql("sqlite3", src);
+        Project project;
+        sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+
+        Contractor contractor;
+        sql << "select * from users where role='contractor' and username=:username",
+            soci::use(session()["username"]), soci::into(contractor);
+
+        int contractor_id;
+        sql << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
+
+        if (contractor_id == contractor.id) {
+          if (project.state->integer() == 0) {
+            project.advance(event::start);
+          } else if (project.state->integer() == 1) {
+            project.advance(event::hired);
+          } else {
+            project.advance(event::completed);
+          }
+          response().set_redirect_header("/projects/" + id);
+          return;
+        }
+        response().set_redirect_header("/");
+      } else {
+        response().set_redirect_header("/");
+      }
+    }
+    response().set_redirect_header("/");
   }
 };
 
