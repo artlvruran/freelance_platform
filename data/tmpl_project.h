@@ -14,6 +14,7 @@ namespace Data {
 struct singleProjectPage {
   Project project;
   Employee employee;
+  bool has_right = false;
   bool is_employee = false;
   bool is_bid_created = false;
   std::vector<Bid> bids;

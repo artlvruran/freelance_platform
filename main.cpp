@@ -260,10 +260,13 @@ class WebSite : public cppcms::application {
               soci::use(session()["username"]), soci::into(contractor);
 
         if (contractor_id == contractor.id) {
+          pr.project_page.has_right = true;
           soci::rowset<Bid> rs = (sql.prepare << "select * from bids where project_id = :id", soci::use(id));
           for (auto& bid : rs) {
             pr.project_page.bids.push_back(bid);
           }
+        } else {
+          pr.project_page.has_right = false;
         }
       }
     }

@@ -53,7 +53,7 @@
                 <a role="button" class="btn btn-success" href="/projects/bid_on/<%= project_page.project.id %>"> Bid on </a>
             <% end %>
         <% end %>
-        <% if (!content.project_page.is_employee) %>
+        <% if (!content.project_page.is_employee && content.project_page.has_right) %>
             <table style="min-width: 100%">
                 <tbody>
                     <th style="width: 50%">
