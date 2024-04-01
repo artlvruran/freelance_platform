@@ -16,9 +16,9 @@ class Employee : public User {
 
   Employee() = default;
 
-  void sign_up() override;
+  void sign_up();
 
-  bool log_in() override;
+  bool log_in();
 
   void create_bid(int project_id);
  private:

@@ -1,6 +1,6 @@
-<% c++ #include "data/tmpl_projects.h" %>
+<% c++ #include "data/tmpl_contractors.h" %>
 <% skin defskin %>
-<% view Projects uses Data::Projects extends Master%>
+<% view Contractors uses Data::Contractors extends Master%>
 <% template page_main() %><% end %>
 <% template page_footer() %><% end %>
 <% template page_left_sidebar() %><% end %>
@@ -38,13 +38,13 @@
     </header>
     <div class="middle">
         <div class="row">
-            <% foreach project in projects_page.projects %>
+            <% foreach contractor in contractors_page.contractors %>
                 <% item %>
                 <div class="card mb-3" style="width: 30%; height: 100px; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
                     <div class="card-header">
                         <h2>
-                        <a class="nav-link" href="/projects/<%= project.id %>">
-                            <%= project.name %>
+                        <a class="nav-link" href="/users/<%= contractor.id %>">
+                            <%= contractor.username %>
                         </a>
                         </h2>
                     </div>

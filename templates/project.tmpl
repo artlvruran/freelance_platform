@@ -101,13 +101,13 @@
                             Current status:
                             <% if (content.project_page.project.state->integer() == 0) %>
                                 is not started
-                                <a role="button" class="btn btn-success" href="/projects/advance/<%= project_page.project.id %>"> Advance </a>
+                                <a role="button" class="btn btn-success" href="/projects/<%= project_page.project.id %>/advance"> Advance </a>
                             <% elif (content.project_page.project.state->integer() == 1) %>
                                 is preparing
-                                <a role="button" class="btn btn-success" href="/projects/advance/<%= project_page.project.id %>"> Advance </a>
+                                <a role="button" class="btn btn-success" href="/projects/<%= project_page.project.id %>/advance"> Advance </a>
                             <% elif (content.project_page.project.state->integer() == 2) %>
                                 is processing
-                                <a role="button" class="btn btn-success" href="/projects/advance/<%= project_page.project.id %>"> Advance </a>
+                                <a role="button" class="btn btn-success" href="/projects/<%= project_page.project.id %>/advance"> Advance </a>
                             <% elif (content.project_page.project.state->integer() == 3) %>
                                 is completed
                             <% end %>

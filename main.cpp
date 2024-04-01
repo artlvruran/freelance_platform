@@ -10,6 +10,8 @@
 #include "data/tmpl_projects.h"
 #include "data/tmpl_project.h"
 #include "data/tmpl_add_project.h"
+#include "data/tmpl_contractors.h"
+#include "data/tmpl_user.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
@@ -26,15 +28,24 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/logout", &WebSite::log_out, this);
     mapper().assign("logout");
 
+    dispatcher().assign("/users/contractors", &WebSite::contractors, this);
+    mapper().assign("/users/contractors");
 
-    dispatcher().assign("/projects/advance/(.+)", &WebSite::advance, this, 1);
-    mapper().assign("/projects/advance/{1}");
+    dispatcher().assign("/users/(.+)/subscribe", &WebSite::subscribe, this, 1);
+    mapper().assign("/users/{1}");
+
+    dispatcher().assign("/users/(.+)", &WebSite::user, this, 1);
+    mapper().assign("/users/{1}");
+
 
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 
     dispatcher().assign("/projects/add_project", &WebSite::add_project, this);
     mapper().assign("/projects/add_project");
+
+    dispatcher().assign("/projects/(.+)/advance", &WebSite::advance, this, 1);
+    mapper().assign("/projects/{1}/advance");
 
     dispatcher().assign("/projects/(.+)/(.+)", &WebSite::consider, this, 1, 2);
     mapper().assign("/projects/bid_on/{1}/{2}");
@@ -62,6 +73,7 @@ class WebSite : public cppcms::application {
     }
     object.page.menuList.push_back(std::pair<std::string,std::string>("/","Main"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/projects","Projects"));
+    object.page.menuList.push_back(std::pair<std::string,std::string>("/users/contractors","Contractors"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
     object.page.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
@@ -388,6 +400,74 @@ class WebSite : public cppcms::application {
       } else {
         response().set_redirect_header("/");
       }
+    }
+    response().set_redirect_header("/");
+  }
+
+  virtual void contractors() {
+    Data::Contractors cntr;
+
+    add_menu(cntr);
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    soci::rowset<Contractor> contractors = (sql.prepare << "select * from users where role='contractor'");
+    std::vector<Contractor> all_contractors;
+    for (auto it = contractors.begin(); it != contractors.end(); ++it) {
+      all_contractors.push_back(*it);
+    }
+    cntr.contractors_page.contractors = all_contractors;
+    render("Contractors", cntr);
+  }
+
+  virtual void user(std::string id) {
+    Data::SingleUser usr;
+
+    add_menu(usr);
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    User user;
+    sql << "select * from users where id=:id", soci::use(id), soci::into(user);
+
+    usr.user_page.user = user;
+
+    if (session().is_set("username") && user.user_role == role::contractor) {
+      User current_user;
+      sql << "select * from users where username=:username",
+          soci::use(session()["username"]), soci::into(current_user);
+
+      int cnt;
+      sql << "select count(*) from subscriptions where contractor_id=:contractor_id and user_id=:user_id",
+          soci::use(id), soci::use(current_user.id), soci::into(cnt);
+
+      if (cnt != 0) {
+        usr.user_page.is_subscribed = true;
+      } else {
+        usr.user_page.is_subscribed = false;
+      }
+    }
+    render("SingleUser", usr);
+  }
+
+
+  virtual void subscribe(std::string id) {
+    if (session().is_set("username")) {
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+      Contractor contractor;
+      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
+
+      User user;
+      sql << "select * from users where username=:username",
+          soci::use(session()["username"]), soci::into(user);
+
+      contractor.register_observer(user);
+      response().set_redirect_header("/users/" + std::to_string(contractor.id));
+      return;
     }
     response().set_redirect_header("/");
   }
