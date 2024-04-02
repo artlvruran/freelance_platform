@@ -2,8 +2,8 @@
 // Created by kirill on 30.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_DATA_TMPL_MASTER_H_
-#define FREELANCEPLATFORM_DATA_TMPL_MASTER_H_
+
+#pragma once
 
 #include <cppcms/view.h>
 #include "../src/user.h"
@@ -37,5 +37,3 @@ namespace Data {
     ~Master(){}
   };
 }
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_MASTER_H_

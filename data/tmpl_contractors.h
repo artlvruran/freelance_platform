@@ -1,13 +1,12 @@
 //
 // Created by kirill on 01.04.24.
 //
-
-#ifndef FREELANCEPLATFORM_DATA_TMPL_CONTRACTORS_H_
-#define FREELANCEPLATFORM_DATA_TMPL_CONTRACTORS_H_
+#pragma once
 
 #include <cppcms/view.h>
 #include "../src/contractor.h"
 #include "tmpl_master.h"
+
 namespace Data {
 
 struct contractorsPage {
@@ -21,5 +20,3 @@ struct Contractors : public Master {
 };
 }
 
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_CONTRACTORS_H_

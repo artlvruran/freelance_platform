@@ -2,8 +2,8 @@
 // Created by kirill on 30.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_DATA_TMPL_PROJECTS_H_
-#define FREELANCEPLATFORM_DATA_TMPL_PROJECTS_H_
+
+#pragma once
 
 #include <cppcms/view.h>
 #include "../src/project.h"
@@ -20,5 +20,3 @@ namespace Data {
     Data::projectsPage projects_page;
   };
 }
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_PROJECTS_H_

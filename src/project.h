@@ -2,9 +2,6 @@
 // Created by kirill on 22.02.24.
 //
 
-#ifndef FREELANCEPLATFORM_SRC_PROJECT_H_
-#define FREELANCEPLATFORM_SRC_PROJECT_H_
-
 #pragma once
 #include <string>
 #include "employee.h"
@@ -114,4 +111,3 @@ template<>
     }
   };
 }
-#endif //FREELANCEPLATFORM_SRC_PROJECT_H_

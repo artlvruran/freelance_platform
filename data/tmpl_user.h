@@ -2,8 +2,7 @@
 // Created by kirill on 01.04.24.
 //
 
-#ifndef FREELANCEPLATFORM_DATA_TMPL_USER_H_
-#define FREELANCEPLATFORM_DATA_TMPL_USER_H_
+#pragma once
 
 #include <cppcms/view.h>
 #include "../src/project.h"
@@ -23,6 +22,3 @@ struct SingleUser : public Master {
   Data::singleUserPage user_page;
 };
 }
-
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_USER_H_

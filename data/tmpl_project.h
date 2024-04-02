@@ -2,8 +2,8 @@
 // Created by kirill on 31.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_DATA_TMPL_PROJECT_H_
-#define FREELANCEPLATFORM_DATA_TMPL_PROJECT_H_
+
+#pragma once
 
 #include <cppcms/view.h>
 #include "../src/project.h"
@@ -28,5 +28,3 @@ struct SingleProject : public Master {
 };
 }
 
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_PROJECT_H_

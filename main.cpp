@@ -37,7 +37,6 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/users/(.+)", &WebSite::user, this, 1);
     mapper().assign("/users/{1}");
 
-
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 

@@ -2,9 +2,7 @@
 // Created by kirill on 30.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_DATA_TMPL_SIGNUP_H_
-#define FREELANCEPLATFORM_DATA_TMPL_SIGNUP_H_
-
+#pragma once
 
 #include <cppcms/view.h>
 #include <cppcms/form.h>
@@ -44,5 +42,3 @@ namespace Data {
     Data::infoForm info;
   };
 }
-
-#endif //FREELANCEPLATFORM_DATA_TMPL_SIGNUP_H_
