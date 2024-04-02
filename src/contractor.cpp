@@ -2,7 +2,6 @@
 // Created by kirill on 26.02.24.
 //
 
-#pragma once
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"

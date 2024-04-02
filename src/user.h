@@ -1,10 +1,6 @@
 //
 // Created by kirill on 22.02.24.
 //
-
-#ifndef FREELANCEPLATFORM_SRC_USER_H_
-#define FREELANCEPLATFORM_SRC_USER_H_
-
 #pragma once
 #include <iostream>
 #include <string>
@@ -32,5 +28,3 @@ class User {
   virtual void sign_up() = 0;
   void notify(int contractor_id);
 };
-
-#endif //FREELANCEPLATFORM_SRC_USER_H_

@@ -1,8 +1,6 @@
 //
 // Created by kirill on 26.02.24.
 //
-
-#pragma once
 #include "project_factory.h"
 
 Task ProjectFactory::create_task(const std::string& name) const {

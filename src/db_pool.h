@@ -2,8 +2,7 @@
 // Created by kirill on 11.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_SRC_DB_POOL_H_
-#define FREELANCEPLATFORM_SRC_DB_POOL_H_
+#pragma once
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -60,5 +59,3 @@ class db_pool {
   }
 };
 
-
-#endif //FREELANCEPLATFORM_SRC_DB_POOL_H_

@@ -2,8 +2,7 @@
 // Created by kirill on 08.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_SRC_BID_STATE_H_
-#define FREELANCEPLATFORM_SRC_BID_STATE_H_
+#pragma once
 
 #include <memory>
 
@@ -34,5 +33,3 @@ struct BidStateRejected : BidState {
   std::unique_ptr<BidState> on_event(bid_event e) override;
   std::string str() const;
 };
-
-#endif //FREELANCEPLATFORM_SRC_BID_STATE_H_

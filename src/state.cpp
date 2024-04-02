@@ -1,7 +1,6 @@
 //
 // Created by kirill on 08.03.24.
 //
-#pragma once
 #include "state.h"
 
 std::unique_ptr<State> NotStarted::on_event(event e) {

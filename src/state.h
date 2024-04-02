@@ -1,9 +1,6 @@
 //
 // Created by kirill on 08.03.24.
 //
-
-#ifndef FREELANCEPLATFORM_SRC_STATE_H_
-#define FREELANCEPLATFORM_SRC_STATE_H_
 #pragma once
 #include <iostream>
 #include <memory>
@@ -38,6 +35,3 @@ struct Completed : State {
   std::unique_ptr<State> on_event(event e) override;
   int integer() const override;
 };
-
-
-#endif //FREELANCEPLATFORM_SRC_STATE_H_

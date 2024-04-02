@@ -2,8 +2,7 @@
 // Created by kirill on 08.03.24.
 //
 
-#ifndef FREELANCEPLATFORM_SRC_BID_H_
-#define FREELANCEPLATFORM_SRC_BID_H_
+#pragma once
 
 #include "bid_state.h"
 #include "db_pool.h"
@@ -58,5 +57,3 @@ template<> struct type_conversion<Bid> {
   }
 };
 }
-
-#endif //FREELANCEPLATFORM_SRC_BID_H_
