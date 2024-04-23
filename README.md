@@ -16,5 +16,5 @@
     * ### BidStateConsidering - на рассмотрении
     * ### BidStateApproved - принята
     * ### BidStateRejected - отклонена
-![src/frealnceplatform Class diagram.png]
+![diagrams/frealnceplatform Class diagram.png]
 (https://github.com/artlvruran/freelance_platform/blob/checkpoint_1/diagrams/frealnceplatform%20Class%20diagram.png)
