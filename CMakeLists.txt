@@ -8,11 +8,9 @@ add_executable(FreelancePlatform main.cpp
         src/project.h
         src/employee.h
         src/contractor.h
-        src/project_factory.h
         src/contractor.cpp
         src/employee.cpp
         src/project.cpp
-        src/project_factory.cpp
         src/constants.h
         src/state.h
         src/state.cpp
