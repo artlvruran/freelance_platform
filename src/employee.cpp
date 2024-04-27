@@ -10,7 +10,7 @@ void Employee::sign_up() {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << "insert into users (username, email, password, role) values(:username, :email, :password, 'employee')", soci::use(*this);
+  sql << "insert into users (username, email, password, role, fullname) values(:username, :email, :password, 'employee', :fullname)", soci::use(*this);
 }
 
 bool Employee::log_in() {

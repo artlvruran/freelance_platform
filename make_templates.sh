@@ -30,7 +30,9 @@ TEMPLATES="$INPUT/templates/master.tmpl
            $INPUT/templates/project.tmpl
            $INPUT/templates/add_project.tmpl
            $INPUT/templates/contractors.tmpl
-           $INPUT/templates/user.tmpl"
+           $INPUT/templates/user.tmpl
+           $INPUT/templates/login.tmpl
+           $INPUT/templates/profile_edit.tmpl"
 
 cppcms_tmpl_cc $TEMPLATES -o $INPUT/all_tmpl.cpp
 

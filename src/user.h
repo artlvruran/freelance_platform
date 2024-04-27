@@ -21,6 +21,10 @@ class User {
   std::string email;
   std::string password;
   role user_role;
+  double rate;
+  std::string cover;
+  std::string avatar;
+  std::string fullname;
 
   User() = default;
 
@@ -47,6 +51,10 @@ template<> struct type_conversion<User> {
       p.email = v.get<std::string>("email", {});
       p.password = v.get<std::string>("password", {});
       p.user_role = v.get<std::string>("role", {}) == "employee" ? role::employee : role::contractor;
+      p.rate = v.get<double>("rate", 0);
+      p.cover = v.get<std::string>("cover", {});
+      p.avatar = v.get<std::string>("avatar", {});
+      p.fullname = v.get<std::string>("fullname", {});
     } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
   }
 
@@ -57,6 +65,10 @@ template<> struct type_conversion<User> {
       v.set("email", p.email);
       v.set("password", p.password);
       v.set("role", std::string(p.user_role == role::contractor ? "contractor" : "employee"));
+      v.set("rate", p.rate);
+      v.set("cover", p.cover);
+      v.set("avatar", p.avatar);
+      v.set("fullname", p.fullname);
       ind = i_ok;
       return;
     } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }

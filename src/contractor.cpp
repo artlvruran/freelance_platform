@@ -11,7 +11,7 @@ void Contractor::sign_up() {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << "insert into users (username, email, password, role) values(:username, :email, :password, 'contractor')", soci::use(*this);
+  sql << "insert into users (username, email, password, fullname, role) values(:username, :email, :password, :fullname, 'contractor')", soci::use(*this);
   int idd;
   sql << "select id from users "
          "  where username == :username", soci::into(idd), soci::use(username);

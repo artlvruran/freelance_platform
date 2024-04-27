@@ -5,6 +5,7 @@
 #include <cppcms/url_mapper.h>
 #include <cppcms/service.h>
 #include <cppcms/application.h>
+#include <cppcms/http_file.h>
 #include "data/tmpl_master.h"
 #include "data/tmpl_signup.h"
 #include "data/tmpl_projects.h"
@@ -12,13 +13,222 @@
 #include "data/tmpl_add_project.h"
 #include "data/tmpl_contractors.h"
 #include "data/tmpl_user.h"
+#include "data/tmpl_profile_edit.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
+#include <fstream>
+
+template<typename T>
+void add_menu(T& object, cppcms::application& app) {
+  if (app.session().is_set("username")) {
+    object.current_username = app.session()["username"];
+  }
+  object.menuList.push_back(std::pair<std::string,std::string>("/","Main"));
+  object.menuList.push_back(std::pair<std::string,std::string>("/projects","Projects"));
+  object.menuList.push_back(std::pair<std::string,std::string>("/users/contractors","Contractors"));
+  object.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
+  object.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
+  object.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
+  if (app.session().is_set("role") && app.session()["role"] == "contractor") {
+    object.menuList.push_back(std::pair<std::string, std::string>("/projects/add_project", "Add Project"));
+  }
+}
+
+User get_user(cppcms::application& app) {
+  if (app.session().is_set("username")) {
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    User current_user;
+    sql << "select * from users where username=:username",
+        soci::use(app.session()["username"]), soci::into(current_user);
+    return current_user;
+  }
+  return {};
+}
+
+class Users : public cppcms::application {
+ public:
+  Users(cppcms::service &srv) : cppcms::application(srv) {
+    dispatcher().assign("/contractors", &Users::contractors, this);
+    mapper().assign("/contractors");
+
+    dispatcher().assign("/(.+)/subscribe", &Users::subscribe, this, 1);
+    mapper().assign("/{1}");
+
+    dispatcher().assign("/(.+)/unsubscribe", &Users::unsubscribe, this, 1);
+    mapper().assign("/{1}");
+
+    dispatcher().assign("/(.+)/edit", &Users::edit, this, 1);
+    mapper().assign("/{1}");
+
+    dispatcher().assign("/(.+)", &Users::user, this, 1);
+    mapper().assign("/{1}");
+  }
+
+  virtual void contractors() {
+    Data::Contractors cntr;
+
+    add_menu(cntr, *this);
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    soci::rowset<Contractor> contractors = (sql.prepare << "select * from users where role='contractor'");
+    std::vector<Contractor> all_contractors;
+    for (auto it = contractors.begin(); it != contractors.end(); ++it) {
+      all_contractors.push_back(*it);
+    }
+    cntr.contractors_page.contractors = all_contractors;
+    render("Contractors", cntr);
+  }
+
+  virtual void user(std::string id) {
+    Data::SingleUser usr;
+
+    add_menu(usr, *this);
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    User user;
+    sql << "select * from users where id=:id", soci::use(id), soci::into(user);
+
+    usr.user_page.user = user;
+
+    if (session().is_set("username") && user.user_role == role::contractor) {
+      User current_user;
+      sql << "select * from users where username=:username",
+          soci::use(session()["username"]), soci::into(current_user);
+
+      int cnt;
+      sql << "select count(*) from subscriptions where contractor_id=:contractor_id and user_id=:user_id",
+          soci::use(id), soci::use(current_user.id), soci::into(cnt);
+
+      if (cnt != 0) {
+        usr.user_page.is_subscribed = true;
+      } else {
+        usr.user_page.is_subscribed = false;
+      }
+    }
+
+    if (session().is_set("username") && session()["username"] == usr.user_page.user.username) {
+      usr.is_me = true;
+    } else {
+      usr.is_me = false;
+    }
+
+    render("SingleUser", usr);
+  }
+
+  virtual void subscribe(std::string id) {
+    if (session().is_set("username")) {
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+      Contractor contractor;
+      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
+
+      User user;
+      sql << "select * from users where username=:username",
+          soci::use(session()["username"]), soci::into(user);
+
+      contractor.register_observer(user);
+      response().set_redirect_header("/users/" + std::to_string(contractor.id));
+      return;
+    }
+    response().set_redirect_header("/");
+  }
+
+  virtual void unsubscribe(std::string id) {
+    if (session().is_set("username")) {
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+      Contractor contractor;
+      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
+
+      User user;
+      sql << "select * from users where username=:username",
+          soci::use(session()["username"]), soci::into(user);
+
+      contractor.remove_observer(user);
+      response().set_redirect_header("/users/" + std::to_string(contractor.id));
+      return;
+    }
+    response().set_redirect_header("/");
+  }
+
+  virtual void edit(std::string id) {
+    Data::ProfileEdit edt;
+
+    add_menu(edt, *this);
+
+    if (request().request_method() == "POST") {
+
+      edt.edit_form.load(context());
+      auto current_user = get_user(*this);
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+      std::string avatar_name;
+      std::string cover_name;
+
+      if (edt.edit_form.avatar_file.validate()) {
+        avatar_name = std::to_string(std::hash<std::string>()(session()["username"]));
+        if (edt.edit_form.avatar_file.value()->mime() == "image/png") {
+          avatar_name += ".png";
+        } else {
+          avatar_name += ".jpg";
+        }
+        edt.edit_form.avatar_file.value()->save_to("./media/images/" + avatar_name);
+        current_user.avatar = avatar_name;
+
+        sql << "update users "
+               "set avatar = :avatar "
+               "where id = :id", soci::use(avatar_name), soci::use(current_user.id);
+      }
+
+      if (edt.edit_form.cover_file.validate()) {
+        cover_name = std::to_string(std::hash<std::string>()(session()["username"] + "cover"));
+        if (edt.edit_form.cover_file.value()->mime() == "image/png") {
+          cover_name += ".png";
+        } else {
+          cover_name += ".jpg";
+        }
+        edt.edit_form.cover_file.value()->save_to("./media/images/" + cover_name);
+        current_user.cover = cover_name;
+        sql << "update users "
+               "set cover = :cover "
+               "where id = :id", soci::use(cover_name), soci::use(current_user.id);
+
+      }
+    }
+
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    User user;
+    sql << "select * from users where id=:id", soci::use(id), soci::into(user);
+
+    if (session().is_set("username") && session()["username"] == user.username) {
+      edt.is_me = true;
+    } else {
+      edt.is_me = false;
+    }
+
+    render("ProfileEdit", edt);
+  }
+};
 
 class WebSite : public cppcms::application {
  public:
   WebSite(cppcms::service& s) : cppcms::application(s) {
+    attach(new Users(s),
+           "users", "/users/{1}", "/users(/(.*))?", 1);
+
     dispatcher().assign("/signup", &WebSite::signup, this);
     mapper().assign("signup");
 
@@ -27,15 +237,6 @@ class WebSite : public cppcms::application {
 
     dispatcher().assign("/logout", &WebSite::log_out, this);
     mapper().assign("logout");
-
-    dispatcher().assign("/users/contractors", &WebSite::contractors, this);
-    mapper().assign("/users/contractors");
-
-    dispatcher().assign("/users/(.+)/subscribe", &WebSite::subscribe, this, 1);
-    mapper().assign("/users/{1}");
-
-    dispatcher().assign("/users/(.+)", &WebSite::user, this, 1);
-    mapper().assign("/users/{1}");
 
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
@@ -63,27 +264,9 @@ class WebSite : public cppcms::application {
     cppcms::application::main(path);
   }
 
-  template<typename T>
-  void add_menu(T& object) {
-    object.page.description = "description";
-    object.page.keywords = "keywords";
-    if (session().is_set("username")) {
-      object.page.current_username = session()["username"];
-    }
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/","Main"));
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/projects","Projects"));
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/users/contractors","Contractors"));
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
-    object.page.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
-    if (session().is_set("role") && session()["role"] == "contractor") {
-      object.page.menuList.push_back(std::pair<std::string, std::string>("/projects/add_project", "Add Project"));
-    }
-  }
-
   virtual void master() {
     Data::Master tmpl;
-    add_menu(tmpl);
+    add_menu(tmpl, *this);
 
 
     if (session().is_set("username")) {
@@ -126,7 +309,7 @@ class WebSite : public cppcms::application {
         }
       }
 
-      tmpl.page.notifications = notifications;
+      tmpl.notifications = notifications;
 
     }
 
@@ -135,7 +318,7 @@ class WebSite : public cppcms::application {
 
   virtual void signup() {
     Data::Signup sgn;
-    add_menu(sgn);
+    add_menu(sgn, *this);
 
     if (request().request_method() == "POST") {
       sgn.info.load(context());
@@ -145,12 +328,14 @@ class WebSite : public cppcms::application {
           employee.username = sgn.info.username.value();
           employee.email = sgn.info.email.value();
           employee.password = sgn.info.password.value();
+          employee.fullname = sgn.info.fullname.value();
           employee.sign_up();
         } else {
           Contractor contractor;
           contractor.username = sgn.info.username.value();
           contractor.email = sgn.info.email.value();
           contractor.password = sgn.info.password.value();
+          contractor.fullname = sgn.info.fullname.value();
           contractor.sign_up();
         }
         session().set("username", sgn.info.username.value());
@@ -166,36 +351,32 @@ class WebSite : public cppcms::application {
   }
 
   virtual void login() {
-    Data::Signup sgn;
-    add_menu(sgn);
+    Data::Login lgn;
+    add_menu(lgn, *this);
 
     if (request().request_method() == "POST") {
-      sgn.info.load(context());
-      if (sgn.info.validate()) {
-        if (sgn.info.role.selected_id() == "0") {
+      lgn.info.load(context());
+      if (lgn.info.validate()) {
+        if (lgn.info.role.selected_id() == "0") {
           Employee employee;
-          employee.username = sgn.info.username.value();
-          employee.email = sgn.info.email.value();
-          employee.password = sgn.info.password.value();
+          employee.username = lgn.info.username.value();
+          employee.password = lgn.info.password.value();
           if (employee.log_in()) {
-            session().set("username", sgn.info.username.value());
-            session().set("email", sgn.info.email.value());
-            session().set("password", sgn.info.password.value());
-            session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
+            session().set("username", lgn.info.username.value());
+            session().set("password", lgn.info.password.value());
+            session().set("role", (lgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
 
             response().set_redirect_header("/");
             return;
           }
         } else {
           Contractor contractor;
-          contractor.username = sgn.info.username.value();
-          contractor.email = sgn.info.email.value();
-          contractor.password = sgn.info.password.value();
+          contractor.username = lgn.info.username.value();
+          contractor.password = lgn.info.password.value();
           if (contractor.log_in()) {
-            session().set("username", sgn.info.username.value());
-            session().set("email", sgn.info.email.value());
-            session().set("password", sgn.info.password.value());
-            session().set("role", (sgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
+            session().set("username", lgn.info.username.value());
+            session().set("password", lgn.info.password.value());
+            session().set("role", (lgn.info.role.selected_id() == "0" ? "employee" : "contractor"));
             response().set_redirect_header("/");
             return;
           }
@@ -203,13 +384,13 @@ class WebSite : public cppcms::application {
       }
     }
 
-    render("Signup", sgn);
+    render("Login", lgn);
   }
 
   virtual void projects() {
     Data::Projects mn;
 
-    add_menu(mn);
+    add_menu(mn, *this);
 
     std::string src = "dbname=";
     src += db_source;
@@ -226,7 +407,7 @@ class WebSite : public cppcms::application {
   virtual void project(std::string id) {
     Data::SingleProject pr;
 
-    add_menu(pr);
+    add_menu(pr, *this);
 
     std::string src = "dbname=";
     src += db_source;
@@ -341,7 +522,7 @@ class WebSite : public cppcms::application {
 
   virtual void add_project() {
     Data::AddProject addpr;
-    add_menu(addpr);
+    add_menu(addpr, *this);
 
     if (request().request_method() == "POST") {
       addpr.add_project_form.load(context());
@@ -405,75 +586,8 @@ class WebSite : public cppcms::application {
     }
     response().set_redirect_header("/");
   }
-
-  virtual void contractors() {
-    Data::Contractors cntr;
-
-    add_menu(cntr);
-
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    soci::rowset<Contractor> contractors = (sql.prepare << "select * from users where role='contractor'");
-    std::vector<Contractor> all_contractors;
-    for (auto it = contractors.begin(); it != contractors.end(); ++it) {
-      all_contractors.push_back(*it);
-    }
-    cntr.contractors_page.contractors = all_contractors;
-    render("Contractors", cntr);
-  }
-
-  virtual void user(std::string id) {
-    Data::SingleUser usr;
-
-    add_menu(usr);
-
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    User user;
-    sql << "select * from users where id=:id", soci::use(id), soci::into(user);
-
-    usr.user_page.user = user;
-
-    if (session().is_set("username") && user.user_role == role::contractor) {
-      User current_user;
-      sql << "select * from users where username=:username",
-          soci::use(session()["username"]), soci::into(current_user);
-
-      int cnt;
-      sql << "select count(*) from subscriptions where contractor_id=:contractor_id and user_id=:user_id",
-          soci::use(id), soci::use(current_user.id), soci::into(cnt);
-
-      if (cnt != 0) {
-        usr.user_page.is_subscribed = true;
-      } else {
-        usr.user_page.is_subscribed = false;
-      }
-    }
-    render("SingleUser", usr);
-  }
-
-
-  virtual void subscribe(std::string id) {
-    if (session().is_set("username")) {
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
-      Contractor contractor;
-      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
-
-      User user;
-      sql << "select * from users where username=:username",
-          soci::use(session()["username"]), soci::into(user);
-
-      contractor.register_observer(user);
-      response().set_redirect_header("/users/" + std::to_string(contractor.id));
-      return;
-    }
-    response().set_redirect_header("/");
-  }
 };
+
 
 int main(int argc, char** argv) {
   try {
