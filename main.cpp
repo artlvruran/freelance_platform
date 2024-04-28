@@ -15,6 +15,7 @@
 #include "data/tmpl_user.h"
 #include "data/tmpl_profile_edit.h"
 #include "data/tmpl_notifications.h"
+#include "data/tmpl_main.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
@@ -35,25 +36,27 @@ void add_menu(T& object, cppcms::application& app) {
   if (app.session().is_set("username")) {
     object.menuList.push_back(std::pair<std::string,std::string>("/notifications","Notifications"));
     std::vector<std::pair<int, std::string>> notifications;
+
     std::string src = "dbname=";
     src += db_source;
     soci::session sql("sqlite3", src);
+
     int user_id;
     sql << "select id from users where username=:username", soci::use(app.session()["username"]), soci::into(user_id);
-    soci::rowset<soci::row>
-        nots = (sql.prepare << "select * from notifications where user_id=:user_id", soci::use(user_id));
+
+    soci::rowset<soci::row> nots = (sql.prepare << "select * from notifications where user_id=:user_id" , soci::use(user_id));
     for (auto &it : nots) {
       if (!it.get<int>("is_read")) {
         notifications.emplace_back(it.get<int>("id"), it.get<std::string>("description"));
       }
     }
+
     object.notifications = notifications;
   }
 
   if (app.session().is_set("role") && app.session()["role"] == "contractor") {
     object.menuList.push_back(std::pair<std::string, std::string>("/projects/add_project", "Add Project"));
   }
-
 }
 
 User get_user(cppcms::application& app) {
@@ -260,7 +263,7 @@ class WebSite : public cppcms::application {
     mapper().assign("logout");
 
     dispatcher().assign("/notifications", &WebSite::notifications, this);
-    mapper().assign("notifications");
+    mapper().assign("/notifications");
 
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
@@ -289,55 +292,9 @@ class WebSite : public cppcms::application {
   }
 
   virtual void master() {
-    Data::Master tmpl;
+    Data::Main tmpl;
     add_menu(tmpl, *this);
-
-
-    if (session().is_set("username")) {
-      if (request().request_method() == "POST") {
-        std::string paramlist = request().query_string();
-        int notification_id = std::stoi(paramlist.substr(11, paramlist.size() - 10));
-
-        std::string src = "dbname=";
-        src += db_source;
-        soci::session sql("sqlite3", src);
-
-        int user_id;
-        sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
-
-        int not_user_id;
-        sql << "select user_id from notifications where id=:id", soci::use(notification_id), soci::into(not_user_id);
-
-        if (user_id == not_user_id) {
-          User::read(notification_id);
-        }
-        response().set_redirect_header("/");
-        return;
-      }
-    }
-
-    if (session().is_set("username")) {
-      std::vector<std::pair<int, std::string>> notifications;
-
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
-
-      int user_id;
-      sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
-
-      soci::rowset<soci::row> nots = (sql.prepare << "select * from notifications where user_id=:user_id" , soci::use(user_id));
-      for (auto &it : nots) {
-        if (!it.get<int>("is_read")) {
-          notifications.push_back({it.get<int>("id"), it.get<std::string>("description")});
-        }
-      }
-
-      tmpl.notifications = notifications;
-
-    }
-
-    render("Master", tmpl);
+    render("Main", tmpl);
   }
 
   virtual void signup() {
@@ -619,6 +576,28 @@ class WebSite : public cppcms::application {
 
     Data::Notifications ntf;
     add_menu(ntf, *this);
+
+
+    if (request().request_method() == "POST") {
+      std::string paramlist = request().query_string();
+      int notification_id = std::stoi(paramlist.substr(11, paramlist.size() - 10));
+
+      std::string src = "dbname=";
+      src += db_source;
+      soci::session sql("sqlite3", src);
+
+      int user_id;
+      sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
+
+      int not_user_id;
+      sql << "select user_id from notifications where id=:id", soci::use(notification_id), soci::into(not_user_id);
+
+      if (user_id == not_user_id) {
+        User::read(notification_id);
+      }
+      response().set_redirect_header("/");
+      return;
+    }
 
 
     render("Notifications", ntf);

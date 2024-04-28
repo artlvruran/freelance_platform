@@ -162,6 +162,7 @@ body {
 
 .profile-cover {
     background-color: black;
+    margin-bottom: 0;
 }
 
 .profile-caption {
@@ -240,6 +241,9 @@ img {
     object-fit: cover;
     max-height: 800px;
 }
+.generalobject-cover {
+    object-fit: cover;
+}
 
 .right {
     position: absolute;
@@ -266,10 +270,10 @@ img {
 .profile {
     margin-left: 30%;
     margin-right: 30%;
+    margin-bottom: 10%;
 }
 
 .middle {
-    margin-bottom: 50px;
 }
 
 .footer-caption {
@@ -278,9 +282,4 @@ img {
     font-family: "Tangerine", cursive;
     font-weight: 400;
     font-style: normal;
-}
-
-
-footer {
-    margin-top: auto;
 }

@@ -9,7 +9,7 @@
     <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <strong class="me-auto">FreelancePlatform</strong>
-            <form action="/?del_not_id=<%= notification.first %>" method="POST">
+            <form action="/notifications?del_not_id=<%= notification.first %>" method="POST">
                 <input name="close" value="" type="submit" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></input>
             </form>
         </div>
