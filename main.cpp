@@ -14,6 +14,7 @@
 #include "data/tmpl_contractors.h"
 #include "data/tmpl_user.h"
 #include "data/tmpl_profile_edit.h"
+#include "data/tmpl_notifications.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
@@ -30,9 +31,29 @@ void add_menu(T& object, cppcms::application& app) {
   object.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
   object.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
   object.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
+
+  if (app.session().is_set("username")) {
+    object.menuList.push_back(std::pair<std::string,std::string>("/notifications","Notifications"));
+    std::vector<std::pair<int, std::string>> notifications;
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    int user_id;
+    sql << "select id from users where username=:username", soci::use(app.session()["username"]), soci::into(user_id);
+    soci::rowset<soci::row>
+        nots = (sql.prepare << "select * from notifications where user_id=:user_id", soci::use(user_id));
+    for (auto &it : nots) {
+      if (!it.get<int>("is_read")) {
+        notifications.emplace_back(it.get<int>("id"), it.get<std::string>("description"));
+      }
+    }
+    object.notifications = notifications;
+  }
+
   if (app.session().is_set("role") && app.session()["role"] == "contractor") {
     object.menuList.push_back(std::pair<std::string, std::string>("/projects/add_project", "Add Project"));
   }
+
 }
 
 User get_user(cppcms::application& app) {
@@ -238,6 +259,9 @@ class WebSite : public cppcms::application {
     dispatcher().assign("/logout", &WebSite::log_out, this);
     mapper().assign("logout");
 
+    dispatcher().assign("/notifications", &WebSite::notifications, this);
+    mapper().assign("notifications");
+
     dispatcher().assign("/projects/bid_on/(.+)", &WebSite::bid_on, this, 1);
     mapper().assign("/projects/bid_on/{1}");
 
@@ -313,7 +337,7 @@ class WebSite : public cppcms::application {
 
     }
 
-    render("Master",tmpl);
+    render("Master", tmpl);
   }
 
   virtual void signup() {
@@ -585,6 +609,19 @@ class WebSite : public cppcms::application {
       }
     }
     response().set_redirect_header("/");
+  }
+
+  virtual void notifications() {
+    if (!session().is_set("username")) {
+      response().set_redirect_header("/");
+      return;
+    }
+
+    Data::Notifications ntf;
+    add_menu(ntf, *this);
+
+
+    render("Notifications", ntf);
   }
 };
 

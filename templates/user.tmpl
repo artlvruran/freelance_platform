@@ -5,47 +5,45 @@
 
 <figure class="profile-cover">
     <img class="w-100 h-100 object-cover trans3" src="/media/images/<%= user_page.user.cover %>">
-    <figcaption class="profile-caption mt-5">
+    <figcaption class="profile-caption">
         <h1 class="user_title"><%= user_page.user.fullname %></h1>
     </figcaption>
 </figure>
-<div class="middle">
-    <div class="profile">
-        <div class="profile-sidebar">
-            <div class="profile-sidebar-avatar">
-                <img class="image-avatar" src="/media/images/<%= user_page.user.avatar %>">
-            </div>
-            <div class="profile-info">
-                <h4><%= user_page.user.fullname %></h4>
-            </div>
-            <div class="d-grid gap-2">
-                <% if (content.user_page.user.user_role == role::contractor) %>
-                    <% if (!content.user_page.is_subscribed) %>
-                        <a role="button" class="btn btn-success btn-lg rounded-0" href="/users/<%= user_page.user.id %>/subscribe"> Subscribe </a>
-                    <% else %>
-                        <a role="button" class="btn btn-danger btn-lg rounded-0" href="/users/<%= user_page.user.id %>/unsubscribe" disabled> Unsubscribe </a>
-                    <% end %>
+<div class="profile">
+    <div class="profile-sidebar">
+        <div class="profile-sidebar-avatar">
+            <img class="image-avatar" src="/media/images/<%= user_page.user.avatar %>">
+        </div>
+        <div class="profile-info">
+            <h4><%= user_page.user.fullname %></h4>
+        </div>
+        <div class="d-grid gap-2">
+            <% if (content.user_page.user.user_role == role::contractor) %>
+                <% if (!content.user_page.is_subscribed) %>
+                    <a role="button" class="btn btn-success btn-lg rounded-0" href="/users/<%= user_page.user.id %>/subscribe"> Subscribe </a>
                 <% else %>
+                    <a role="button" class="btn btn-danger btn-lg rounded-0" href="/users/<%= user_page.user.id %>/unsubscribe" disabled> Unsubscribe </a>
                 <% end %>
-            </div>
-            <ul class="profile-metrics">
-                <li>
-                    Rate: <%= user_page.user.rate %>
-                </li>
-                <li>
-                    Exp
-                </li>
-            </ul>
-            <div class="d-grid gap-2">
-            <% if (content.is_me) %>
-                <a role="button" class="btn btn-dark btn-lg rounded-0" href="/users/<%= user_page.user.id %>/edit"> Edit Profile</a>
             <% else %>
             <% end %>
-            </div>
         </div>
-        <div class="profile-projects">
+        <ul class="profile-metrics">
+            <li>
+                Rate: <%= user_page.user.rate %>
+            </li>
+            <li>
+                Exp
+            </li>
+        </ul>
+        <div class="d-grid gap-2">
+        <% if (content.is_me) %>
+            <a role="button" class="btn btn-dark btn-lg rounded-0" href="/users/<%= user_page.user.id %>/edit"> Edit Profile</a>
+        <% else %>
+        <% end %>
+        </div>
+    </div>
+    <div class="profile-projects">
 
-        </div>
     </div>
 </div>
 <% end template %>

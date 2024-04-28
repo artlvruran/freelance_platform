@@ -173,7 +173,7 @@ body {
     display: flex;
     left: 0;
     right: 0;
-    top: 0;
+    top: 105px;
     bottom: 0;
     font-family: Tungsten, serif;
     font-style: normal;
@@ -278,4 +278,9 @@ img {
     font-family: "Tangerine", cursive;
     font-weight: 400;
     font-style: normal;
+}
+
+
+footer {
+    margin-top: auto;
 }

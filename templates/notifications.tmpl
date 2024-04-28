@@ -1,0 +1,33 @@
+<% c++ #include "data/tmpl_notifications.h" %>
+<% skin defskin %>
+<% view Notifications uses Data::Notifications extends Master%>
+<% template page_content() %>
+
+<div class="toast-container position-static">
+    <% foreach notification in notifications %>
+    <% item %>
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">FreelancePlatform</strong>
+            <form action="/?del_not_id=<%= notification.first %>" method="POST">
+                <input name="close" value="" type="submit" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></input>
+            </form>
+        </div>
+        <div class="toast-body">
+            <%= notification.second %>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+    <script>
+        $(.toast .btn-close).on('click', function () {
+            $(this).parent().parent().hide()
+        })
+    </script>
+    <% end %>
+    <% end %>
+</div>
+
+<% end template %>
+<% end view %>
+<% end skin %>
