@@ -18,6 +18,7 @@
             <h4><%= user_page.user.fullname %></h4>
         </div>
         <div class="d-grid gap-2">
+            <% if (!content.is_me) %>
             <% if (content.user_page.user.user_role == role::contractor) %>
                 <% if (!content.user_page.is_subscribed) %>
                     <a role="button" class="btn btn-success btn-lg rounded-0" href="/users/<%= user_page.user.id %>/subscribe"> Subscribe </a>
@@ -25,6 +26,8 @@
                     <a role="button" class="btn btn-danger btn-lg rounded-0" href="/users/<%= user_page.user.id %>/unsubscribe" disabled> Unsubscribe </a>
                 <% end %>
             <% else %>
+            <% end %>
+            <a role="button" class="btn btn-primary btn-lg rounded-0" href="/chat/<%= my_id %>/<%= user_page.user.id %>"> Send messge</a>
             <% end %>
         </div>
         <ul class="profile-metrics">

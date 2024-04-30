@@ -1,0 +1,26 @@
+<% c++ #include "data/tmpl_send_message.h" %>
+<% skin defskin %>
+<% view ChatView uses Data::ChatView extends Master%>
+<% template page_content() %>
+
+<ol class="messages_list" style="margin-bottom: 5%; margin-top: 5%">
+<% foreach message in messages %>
+<% item %>
+    <% if (message.first == 0) %>
+        <li class="shared sent">
+            <%= message.second.text %>
+        </li>
+    <% else %>
+        <li class="shared received">
+            <%= message.second.text %>
+        </li>
+    <% end %>
+<% end %>
+<% end %>
+</ol>
+<form method="post" action="" class="text_input"> <% csrf %>
+    <% form as_p chat_form %>
+</form>
+<% end template %>
+<% end view %>
+<% end skin %>

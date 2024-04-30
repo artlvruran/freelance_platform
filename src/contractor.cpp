@@ -19,14 +19,13 @@ void Contractor::sign_up() {
 }
 
 bool Contractor::log_in() {
-  sqlite3 *db;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-  std::string request =
-      (boost::format("SELECT id FROM users WHERE username == '%s' AND email == '%s' AND password == '%s' AND role == 'contractor'") % username % email % password).str();
-  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
-  sqlite3_close(db);
-  return rc == SQLITE_OK;
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+
+  int cnt;
+  sql << "select count(*) from users where username = :username and password = :password and role = 'contractor'", soci::use(*this), soci::into(cnt);
+  return cnt == 1;
 }
 
 void Contractor::consider_bid(Bid& bid, bid_event e) {

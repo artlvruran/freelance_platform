@@ -35,7 +35,8 @@ TEMPLATES="$INPUT/templates/master.tmpl
            $INPUT/templates/login.tmpl
            $INPUT/templates/profile_edit.tmpl
            $INPUT/templates/notifications.tmpl
-           $INPUT/templates/main.tmpl"
+           $INPUT/templates/main.tmpl
+           $INPUT/templates/chat.tmpl"
 
 cppcms_tmpl_cc $TEMPLATES -o $INPUT/all_tmpl.cpp
 

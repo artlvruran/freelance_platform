@@ -8,14 +8,18 @@
 #include <cppcms/form.h>
 #include "tmpl_master.h"
 
+using namespace cppcms;
+
+
+
 namespace Data {
-  struct infoForm : public cppcms::form {
+  struct loginForm : public cppcms::form {
     cppcms::widgets::text username;
     cppcms::widgets::password password;
     cppcms::widgets::select role;
     cppcms::widgets::submit submit;
 
-    infoForm() {
+    loginForm() {
       username.message("Your nickname");
       password.message("Your password");
       role.message("Your role");
@@ -73,6 +77,6 @@ namespace Data {
   };
 
   struct Login : public Master {
-    Data::infoForm info;
+    Data::loginForm info;
   };
 }

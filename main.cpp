@@ -17,9 +17,11 @@
 #include "data/tmpl_notifications.h"
 #include "data/tmpl_employees.h"
 #include "data/tmpl_main.h"
+#include "data/tmpl_send_message.h"
 #include "src/employee.h"
 #include "src/contractor.h"
 #include "src/constants.h"
+#include "src/message.h"
 #include <fstream>
 
 template<typename T>
@@ -101,6 +103,60 @@ double calculate_rating(const User& user) {
   }
   return double(sum) / sz;
 }
+
+class Chat : public cppcms::application {
+ public:
+  Chat(cppcms::service &srv) : cppcms::application(srv) {
+    dispatcher().assign("/(.+)/(.+)", &Chat::chat, this, 1, 2);
+    mapper().assign("/{1}/{2}");
+  }
+
+  virtual void chat(std::string from_id, std::string to_id) {
+    Data::ChatView view;
+    add_menu(view, *this);
+    if (!session().is_set("username")) {
+      response().set_redirect_header("/");
+      return;
+    }
+    auto current_user = get_user(*this);
+    if (current_user.id != std::stoi(from_id)) {
+      response().set_redirect_header("/");
+      return;
+    }
+
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+
+    if (request().request_method() == "POST") {
+      view.chat_form.load(context());
+      if (view.chat_form.validate()) {
+        auto message = view.chat_form.message.value();
+        sql << "insert into messages (sender_id, address_id, text) values(:sender_id, :address_id, :text)",
+            soci::use(current_user.id), soci::use(to_id), soci::use(message);
+      }
+    }
+
+    soci::rowset<Message> my_messages = (sql.prepare << "select * from messages where sender_id=:sender_id and address_id=:address_id",
+        soci::use(from_id), soci::use(to_id));
+    soci::rowset<Message> their_messages = (sql.prepare << "select * from messages where sender_id=:sender_id and address_id=:address_id",
+        soci::use(to_id), soci::use(from_id));
+
+    for (auto& my_message : my_messages) {
+      view.messages.emplace_back(0, my_message);
+    }
+    for (auto& their_message : their_messages) {
+      view.messages.emplace_back(1, their_message);
+    }
+
+    auto comparator = [](const std::pair<bool, Message>& first, const std::pair<bool, Message>& second) {
+      return first.second.id < second.second.id;
+    };
+
+    std::sort(view.messages.begin(), view.messages.end(), comparator);
+    render("ChatView", view);
+  }
+};
 
 class Users : public cppcms::application {
  public:
@@ -193,6 +249,8 @@ class Users : public cppcms::application {
       usr.my_rate = 0;
       sql << "select rate from rates where rater_id=:rater_id and target_id=:target_id",
           soci::use(current_user.id), soci::use(id), soci::into(usr.my_rate);
+
+      usr.my_id = current_user.id;
     }
 
     if (session().is_set("username") && session()["username"] == usr.user_page.user.username) {
@@ -568,6 +626,9 @@ class WebSite : public cppcms::application {
 
     attach(new Projects(s),
            "projects", "/projects/{1}", "/projects(/(.*))?", 1);
+
+    attach(new Chat(s),
+           "chat", "/chat/{1}", "/chat(/(.*))?", 1);
 
     dispatcher().assign("/signup", &WebSite::signup, this);
     mapper().assign("signup");
