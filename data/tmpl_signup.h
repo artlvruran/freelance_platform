@@ -11,7 +11,7 @@
 namespace Data {
   struct infoForm : public cppcms::form {
     cppcms::widgets::text username;
-    cppcms::widgets::text password;
+    cppcms::widgets::password password;
     cppcms::widgets::select role;
     cppcms::widgets::submit submit;
 
@@ -36,10 +36,10 @@ namespace Data {
 
   struct signupForm : public cppcms::form {
     cppcms::widgets::text username;
-    cppcms::widgets::text password;
+    cppcms::widgets::password password;
     cppcms::widgets::select role;
     cppcms::widgets::submit submit;
-    cppcms::widgets::text email;
+    cppcms::widgets::email email;
     cppcms::widgets::text fullname;
 
     signupForm(){

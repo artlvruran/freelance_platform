@@ -5,13 +5,44 @@
 <div class="row">
     <% foreach project in projects_page.projects %>
         <% item %>
-        <div class="card mb-3" style="width: 30%; height: 100px; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
-            <div class="card-header">
-                <h2>
-                <a class="nav-link" href="/projects/<%= project.id %>">
-                    <%= project.name %>
-                </a>
-                </h2>
+        <div class="card mb-3 rounded-0 p-0" style="width: 30%; height: 200px; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
+            <div class="row m-0" style="height: 100%">
+                <div class="col p-0" style="height: 100%">
+                    <img class="project-author-avatar" src="/media/images/<%= project.second.avatar %>">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h2 class="card-title" style="font-weight: bold">
+                            <a class="nav-link card-title" href="/projects/<%= project.first.id %>">
+                                <%= project.first.name %>
+                            </a>
+                        </h2>
+                        <h4 class="card-text">
+                            <%= project.second.fullname %>
+                        </h4>
+                        <div class="card-text">
+                            <p class="m-0">
+                                <small class="text-muted">
+                                    € <%= project.first.wage %> | <%= project.first.location %>
+                                </small>
+                            </p>
+                            <p>
+                                <small class="text-muted">
+                                    status:
+                                    <% if (project.first.state->integer() == 0) %>
+                                    not started
+                                    <% elif (project.first.state->integer() == 1) %>
+                                    hiring
+                                    <% elif (project.first.state->integer() == 2) %>
+                                    in progress
+                                    <% else %>
+                                    finished
+                                    <% end %>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <% end %>

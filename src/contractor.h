@@ -19,6 +19,7 @@ class Contractor : public User {
   void fire_worker(const Project& project, const Employee& employee);
   void end_project(Project& project);
   void end_project_hiring(Project& project);
+  void start_project_hiring(Project& project);
   void sign_up();
 
   bool log_in();

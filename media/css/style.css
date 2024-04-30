@@ -216,6 +216,7 @@ body {
     object-fit: cover;
     width: 230px;
     height: 230px;
+    background: gray;
 }
 
 img {
@@ -271,6 +272,7 @@ img {
     margin-left: 30%;
     margin-right: 30%;
     margin-bottom: 10%;
+    margin-top: 10%;
 }
 
 .middle {
@@ -282,4 +284,50 @@ img {
     font-family: "Tangerine", cursive;
     font-weight: 400;
     font-style: normal;
+}
+
+.project-author-avatar {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.euro-input {
+    padding-left: 25px !important;
+    background: url("/media/images/euro.png") no-repeat left;
+    background-size: 20px;
+}
+.rating {
+    position: relative;
+    text-align: center;
+    transform: rotateY(180deg);
+}
+.rating input {
+    display: none;
+}
+.rating label {
+    cursor: pointer;
+    width: 25px;
+}
+.rating label:before {
+    width: 25px;
+    content: '★';
+    position: relative;
+    display: block;
+    font-size: 25px;
+    color: #101010;
+}
+.rating label:after {
+    width: 25px;
+    content: '★';
+    position: absolute;
+    display: block;
+    font-size: 25px;
+    color: #1f9cff;
+    opacity: 0;
+    top: 0;
+    transition: .5s;
+}
+.rating label:hover:after,
+.rating input:checked ~ label:after {
+    opacity: 1;
 }

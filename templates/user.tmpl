@@ -39,6 +39,23 @@
         <% if (content.is_me) %>
             <a role="button" class="btn btn-dark btn-lg rounded-0" href="/users/<%= user_page.user.id %>/edit"> Edit Profile</a>
         <% else %>
+            <div class="rating">
+                <form id="starsForm" method="post">
+                    <input type="radio" id="star5" name="star" value="5" formaction="/users/<%= user_page.user.id %>/rate/5" <% if (content.my_rate == 5) %> checked="checked" <% end %>/><label for="star5"></label>
+                    <input type="radio" id="star4" name="star" value="4" formaction="/users/<%= user_page.user.id %>/rate/4" <% if (content.my_rate == 4) %> checked="checked" <% end %>/><label for="star4"></label>
+                    <input type="radio" id="star3" name="star" value="3" formaction="/users/<%= user_page.user.id %>/rate/3" <% if (content.my_rate == 3) %> checked="checked" <% end %>/><label for="star3"></label>
+                    <input type="radio" id="star2" name="star" value="2" formaction="/users/<%= user_page.user.id %>/rate/2" <% if (content.my_rate == 2) %> checked="checked" <% end %>/><label for="star2"></label>
+                    <input type="radio" id="star1" name="star" value="1" formaction="/users/<%= user_page.user.id %>/rate/1" <% if (content.my_rate == 1) %> checked="checked" <% end %>/><label for="star1"></label>
+                </form>
+            </div>
+            <script>
+                document.getElementById('starsForm').addEventListener('click', function(e) {
+                    if (e.target.name === 'star') {
+                        this.setAttribute("action", "/users/<%= user_page.user.id %>/rate/" + e.target.value);
+                        this.submit();
+                    }
+                });
+            </script>
         <% end %>
         </div>
     </div>

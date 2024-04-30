@@ -16,17 +16,23 @@ class Project {
   int contractor_id;
   std::string name;
   std::unique_ptr<State> state = std::make_unique<NotStarted>();
+  std::string location;
+  double wage;
+  std::string description;
 
   Project() = default;
 
-  Project(std::string  name) :
+  Project(std::string name) :
           name(std::move(name))
           {};
 
   Project(const Project& other) :
           id(other.id),
           contractor_id(other.contractor_id),
-          name(other.name)
+          name(other.name),
+          location(other.location),
+          wage(other.wage),
+          description(other.description)
   {
     if (other.state->integer() == 0) {
       state = std::make_unique<NotStarted>();
@@ -43,6 +49,9 @@ class Project {
     id = other.id;
     contractor_id = other.contractor_id;
     name = other.name;
+    location = other.location;
+    wage = other.wage;
+    description = other.description;
     if (other.state->integer() == 0) {
       state = std::make_unique<NotStarted>();
     } else if (other.state->integer() == 1) {
@@ -94,6 +103,10 @@ template<>
           p.state = std::make_unique<Completed>();
         }
 
+        p.location = v.get<std::string>("location", {});
+        p.wage = v.get<double>("wage", 0);
+        p.description = v.get<std::string>("description", {});
+
       } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
     }
 
@@ -103,6 +116,9 @@ template<>
         v.set("name", p.name);
         v.set("state", p.state->integer());
         v.set("contractor_id", p.contractor_id);
+        v.set("location", p.location);
+        v.set("wage", p.wage);
+        v.set("description", p.description);
 
         ind = i_ok;
         return;

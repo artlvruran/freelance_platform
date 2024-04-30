@@ -53,8 +53,8 @@ void Contractor::add_project(Project &project) {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << (boost::format("insert into projects (name, contractor_id, state)"
-         "values(:name, %d, :state)") % id).str(), soci::use(project);
+  sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description)"
+         "values(:name, %d, :state, :location, :wage, :description)") % id).str(), soci::use(project);
   sql << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
@@ -72,8 +72,14 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
 
 void Contractor::end_project(Project& project) {
   project.advance(event::completed);
-  notify_observers("Project " + project.name + " has ended.");
+  notify_observers("Project " + project.name + " has been ended.");
 }
+
+void Contractor::start_project_hiring(Project& project) {
+  project.advance(event::start);
+  notify_observers("Project " + project.name + " has started its hiring.");
+}
+
 
 void Contractor::end_project_hiring(Project& project) {
   project.advance(event::hired);

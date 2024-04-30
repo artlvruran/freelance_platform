@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css" integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">
 </head>
 <body>
     <div class="wrapper">
@@ -25,7 +27,9 @@
                                 <% if (menuItem.first == "/notifications") %>
                                     <li class="nav-item active">
                                         <a class="nav-link position-relative" href="<%= menuItem.first %>">
-                                            <%= menuItem.second %>
+                                            <span class="material-symbols-outlined">
+                                                notifications
+                                            </span>
                                             <% if (content.notifications.size() != 0) %>
                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                     <%= notifications.size() %>
@@ -55,10 +59,9 @@
             <% include page_content() %>
         </div>
     </div>
-
-<footer class="footer mt-auto py-3 bg-black">
-    <p class="footer-caption">©2024 barin corp.</p>
-</footer>
+    <footer class="footer mt-auto py-3 bg-black">
+        <p class="footer-caption">©2024 barin corp.</p>
+    </footer>
 </body>
 </html>
 <% end template %>

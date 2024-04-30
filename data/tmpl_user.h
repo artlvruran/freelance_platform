@@ -23,5 +23,6 @@ struct singleUserPage {
 struct SingleUser : public Master {
   Data::singleUserPage user_page;
   bool is_me = false;
+  double my_rate = 0;
 };
 }

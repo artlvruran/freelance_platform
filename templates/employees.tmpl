@@ -1,0 +1,30 @@
+<% c++ #include "data/tmpl_employees.h" %>
+<% skin defskin %>
+<% view Employees uses Data::Employees extends Master%>
+<% template page_content() %>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    <% foreach employee in employees_page.employees %>
+    <% item %>
+    <div class="col">
+        <div class="card h-100 rowelement rounded-0">
+            <img src="/media/images/<%= employee.cover %>" class="card-img-top card-cover rounded-0">
+            <div class="right">
+                <img src="/media/images/<%= employee.avatar %>" class="avatar">
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">
+                    <a class="nav-link" href="/users/<%= employee.id %>">
+                        <%= employee.fullname %>
+                    </a>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <% end %>
+    <% end %>
+</div>
+
+<% end template %>
+<% end view %>
+<% end skin %>

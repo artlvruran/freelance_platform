@@ -1,8 +1,12 @@
 FROM archlinux
 
+
+RUN echo "Server = https://mirror.kamtv.ru/manjaro/stable/$repo/$arch" >> /etc/pacman.d/mirrorlist
+
+
 RUN pacman -Syu --noconfirm
 RUN pacman -S sudo --noconfirm
-RUN pacman -S base-devel fakeroot jshon expac git wget debugedit --noconfirm
+RUN pacman -S mesa base-devel fakeroot jshon expac git wget debugedit cmake tk bluez-libs gdb xorg-server-xvfb xterm --noconfirm
 
 LABEL authors="kirill"
 
@@ -22,7 +26,6 @@ USER docker
 RUN sudo chown docker /
 RUN sudo chmod 777 .
 
-RUN ./install_paru.sh $psswd
-
-RUN paru -S cppcms --noconfirm
-RUN paru -S soci --noconfirm
+RUN ./install_python2.sh
+RUN ./install_cppcms.sh
+RUN ./install_soci.sh

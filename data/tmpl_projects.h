@@ -7,11 +7,12 @@
 
 #include <cppcms/view.h>
 #include "../src/project.h"
+#include "../src/contractor.h"
 #include "tmpl_master.h"
 namespace Data {
 
   struct projectsPage {
-    std::vector<Project> projects;
+    std::vector<std::pair<Project, Contractor>> projects;
     projectsPage(){};
     ~projectsPage(){};
   };
