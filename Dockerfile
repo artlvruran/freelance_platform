@@ -9,7 +9,7 @@ RUN cat mirrorList >> /etc/pacman.d/mirrorlist
 
 RUN pacman -Syu --noconfirm
 RUN pacman -S sudo --noconfirm
-RUN pacman -S mesa base-devel fakeroot jshon expac git wget debugedit cmake tk bluez-libs gdb xorg-server-xvfb xterm --noconfirm
+RUN pacman -S mesa base-devel fakeroot jshon expac git wget debugedit cmake tk bluez-libs gdb xorg-server-xvfb xterm boost --noconfirm
 
 LABEL authors="kirill"
 
@@ -28,3 +28,7 @@ RUN sudo chmod 777 .
 RUN ./install_python2.sh
 RUN ./install_cppcms.sh
 RUN ./install_soci.sh
+
+EXPOSE 4000
+
+CMD ["run.sh"]
