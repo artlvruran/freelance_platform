@@ -790,7 +790,7 @@ class WebSite : public cppcms::application {
       if (user_id == not_user_id) {
         User::read(notification_id);
       }
-      response().set_redirect_header("/");
+      response().set_redirect_header("/notifications");
       return;
     }
 
