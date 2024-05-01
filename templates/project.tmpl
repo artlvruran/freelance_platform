@@ -8,9 +8,9 @@
 </h1>
 <% if (content.project_page.is_employee) %>
     <% if (content.project_page.is_bid_created) %>
-        <% if (content.project_page.bids[0].state->str() == "approved") %>
+        <% if (content.project_page.bids[0].first.state->str() == "approved") %>
             <button type="button" class="btn btn-outline-success" disabled>Approved</button>
-        <% elif (content.project_page.bids[0].state->str() == "rejected") %>
+        <% elif (content.project_page.bids[0].first.state->str() == "rejected") %>
             <button type="button" class="btn btn-outline-danger" disabled>Rejected</button>
         <% else %>
             <button type="button" class="btn btn-outline-warning" disabled>Considering</button>
@@ -30,7 +30,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col"> id </th>
+                                <th scope="col"> employee </th>
                                 <th scope="col"> status </th>
                             </tr>
                         </thead>
@@ -38,15 +38,15 @@
                             <% foreach bid in project_page.bids %>
                                 <% item %>
                                     <tr>
-                                        <td><%= bid.id %></td>
-                                        <% if (bid.state->str() == "considering") %>
+                                        <td><%= bid.second.fullname %></td>
+                                        <% if (bid.first.state->str() == "considering") %>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a role="button" class="btn btn-success" href="/projects/<%= bid.id %>/approve"> Approve </a>
-                                                    <a role="button" class="btn btn-danger" href="/projects/<%= bid.id %>/reject"> Reject </a>
+                                                    <a role="button" class="btn btn-success" href="/projects/<%= bid.first.id %>/approve"> Approve </a>
+                                                    <a role="button" class="btn btn-danger" href="/projects/<%= bid.first.id %>/reject"> Reject </a>
                                                 </div>
                                             </td>
-                                        <% elif (bid.state->str() == "approved") %>
+                                        <% elif (bid.first.state->str() == "approved") %>
                                             <td>
                                                 <button type="button" class="btn btn-outline-success" disabled> Approved </button>
                                             </td>

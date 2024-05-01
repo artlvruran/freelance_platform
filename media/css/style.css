@@ -407,16 +407,32 @@ img {
 .text_input {
     display: flex;
     flex-direction: row;
-    align-items: center;
     width: 100%;
     justify-content: center;
 }
 .text_input input[type=submit]{
+    padding: 10px 20px;
+    border-radius: 25px;
     cursor: pointer;
-    background: #0b93f6 url("/media/images/send.png") no-repeat right;
+    background: #0b93f6;
     background-size: 24px;
-    border-radius: 10%;
     border-width: 0;
-    width: 24px;
     color: white;
+    position: relative;
+}
+.text_input textarea {
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 400;
+    color: #3F3F3F;
+    width: 450px;
+    height: 6em;
+    line-height: 1.5em;
+    background-color: #F7F7F7;
+    border: none;
+    overflow: auto;
+    resize: none;
+    position: relative;
+    margin-right: -76px;
+    padding-right: 76px;
 }

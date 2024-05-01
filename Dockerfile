@@ -1,7 +1,10 @@
 FROM archlinux
 
+WORKDIR /
 
-RUN echo "Server = https://mirror.kamtv.ru/manjaro/stable/$repo/$arch" >> /etc/pacman.d/mirrorlist
+COPY . /
+
+RUN cat mirrorList >> /etc/pacman.d/mirrorlist
 
 
 RUN pacman -Syu --noconfirm
@@ -9,10 +12,6 @@ RUN pacman -S sudo --noconfirm
 RUN pacman -S mesa base-devel fakeroot jshon expac git wget debugedit cmake tk bluez-libs gdb xorg-server-xvfb xterm --noconfirm
 
 LABEL authors="kirill"
-
-WORKDIR /
-
-COPY . /
 
 ARG psswd=1
 

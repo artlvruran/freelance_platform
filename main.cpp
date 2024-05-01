@@ -78,11 +78,35 @@ User get_user(cppcms::application& app) {
   return {};
 }
 
+Employee get_employee(cppcms::application& app) {
+  if (app.session().is_set("username")) {
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    Employee current_user;
+    sql << "select * from users where username=:username",
+        soci::use(app.session()["username"]), soci::into(current_user);
+    return current_user;
+  } else {
+    throw std::runtime_error("current user is not set");
+  }
+  return {};
+}
+
 User get_user_by_id(cppcms::application& app, const std::string& id) {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
   User user;
+  sql << "select * from users where id=:id", soci::use(id), soci::into(user);
+  return user;
+}
+
+Employee get_employee_by_id(cppcms::application& app, const std::string& id) {
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+  Employee user;
   sql << "select * from users where id=:id", soci::use(id), soci::into(user);
   return user;
 }
@@ -463,7 +487,7 @@ class Projects : public cppcms::application {
             soci::use(id), soci::use(session()["username"]), soci::into(bid, ind);
         if (sql.got_data() && ind == soci::i_ok) {
           pr.project_page.is_bid_created = true;
-          pr.project_page.bids.push_back(bid);
+          pr.project_page.bids.emplace_back(bid, get_employee(*this));
         }
       } else {
         pr.project_page.is_employee = false;
@@ -479,7 +503,7 @@ class Projects : public cppcms::application {
           pr.project_page.has_right = true;
           soci::rowset<Bid> rs = (sql.prepare << "select * from bids where project_id = :id", soci::use(id));
           for (auto& bid : rs) {
-            pr.project_page.bids.push_back(bid);
+            pr.project_page.bids.emplace_back(bid, get_employee_by_id(*this, std::to_string(bid.employee_id)));
           }
         } else {
           pr.project_page.has_right = false;

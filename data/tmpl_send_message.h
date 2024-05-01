@@ -12,11 +12,12 @@ using namespace cppcms;
 
 namespace Data {
 struct sendMessageForm : public cppcms::form {
-  cppcms::widgets::text message;
+  cppcms::widgets::textarea message;
   cppcms::widgets::submit submit;
 
   sendMessageForm() {
     message.attributes_string("placeholder=\"Message...\"");
+    submit.value("Send");
 
     add(message);
     add(submit);

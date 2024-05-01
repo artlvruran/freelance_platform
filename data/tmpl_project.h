@@ -17,7 +17,7 @@ struct singleProjectPage {
   bool has_right = false;
   bool is_employee = false;
   bool is_bid_created = false;
-  std::vector<Bid> bids;
+  std::vector<std::pair<Bid, Employee>> bids;
 
   singleProjectPage(){};
   ~singleProjectPage(){};
