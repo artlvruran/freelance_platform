@@ -19,7 +19,7 @@ class Project {
 
   Project() = default;
 
-  Project(std::string  name) :
+  Project(std::string name) :
           name(std::move(name))
           {};
 
@@ -44,37 +44,39 @@ namespace soci {
 template<>
   struct type_conversion<Project> {
     typedef values base_type;
-    static void from_base(values const &v, indicator ind, Project &p) {
+    static void from_base(values const& values, indicator ind, Project& project) {
       if (ind == i_null) return;
       try {
-        p.id = v.get<int>("id", 0);
-        p.name = v.get<std::string>("name", {});
-        p.contractor_id = v.get<int>("contractor_id", 0);
+        project.id = values.get<int>("id", 0);
+        project.name = values.get<std::string>("name", {});
+        project.contractor_id = values.get<int>("contractor_id", 0);
 
-        int int_status = v.get<int>("state", 0);
+        int int_status = values.get<int>("state", 0);
         if (int_status == 1) {
-          p.state = std::make_unique<NotStarted>();
+          project.state = std::make_unique<NotStarted>();
         } else if (int_status == 2) {
-          p.state = std::make_unique<Preparing>();
+          project.state = std::make_unique<Preparing>();
         } else if (int_status == 3) {
-          p.state = std::make_unique<Processing>();
+          project.state = std::make_unique<Processing>();
         } else {
-          p.state = std::make_unique<Completed>();
+          project.state = std::make_unique<Completed>();
         }
 
-      } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const& exception) { std::cerr << exception.what() << std::endl; }
     }
 
-    static void to_base(const Project &p, values &v, indicator &ind) {
+    static void to_base(const Project& project, values& values, indicator& ind) {
       try {
-        v.set("id", p.id);
-        v.set("name", p.name);
-        v.set("state", p.state->integer());
-        v.set("contractor_id", p.contractor_id);
+        values.set("id", project.id);
+        values.set("name", project.name);
+        values.set("state", project.state->integer());
+        values.set("contractor_id", project.contractor_id);
 
         ind = i_ok;
         return;
-      } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const& exception) {
+        std::cerr << exception.what() << std::endl;
+      }
       ind = i_null;
     }
   };

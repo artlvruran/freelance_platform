@@ -20,14 +20,13 @@ void Contractor::sign_up() {
 }
 
 bool Contractor::log_in() {
-  sqlite3 *db;
-  int rc;
-  rc = sqlite3_open(db_source, &db);
-  std::string request =
-      (boost::format("SELECT id FROM users WHERE username == '%s' AND email == '%s' AND password == '%s')") % username % email % password).str();
-  rc = sqlite3_exec(db, request.c_str(), nullptr, nullptr, nullptr);
-  sqlite3_close(db);
-  return rc == SQLITE_OK;
+  std::string src = "dbname=";
+  src += db_source;
+  soci::session sql("sqlite3", src);
+
+  int cnt;
+  sql << "select count(*) from users where username = :username and password = :password and role = 'contractor'", soci::use(*this), soci::into(cnt);
+  return cnt == 1;
 }
 
 void Contractor::consider_bid(Bid& bid, bid_event e) {
@@ -72,12 +71,18 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
 
 void Contractor::end_project(Project& project) {
   project.advance(event::completed);
-  notify_observers();
+  notify_observers("Project " + project.name + " has been ended.");
 }
+
+void Contractor::start_project_hiring(Project& project) {
+  project.advance(event::start);
+  notify_observers("Project " + project.name + " has started its hiring.");
+}
+
 
 void Contractor::end_project_hiring(Project& project) {
   project.advance(event::hired);
-  notify_observers();
+  notify_observers("Project " + project.name + " has finished its hiring.");
 }
 
 void Contractor::register_observer(const User &user) const {
@@ -97,14 +102,14 @@ void Contractor::remove_observer(const User &user) const {
   sql.close();
 }
 
-void Contractor::notify_observers() const {
+void Contractor::notify_observers(std::string description) const {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
   soci::rowset<int> rs = (sql.prepare << "select user_id from subscriptions where contractor_id = :id", soci::use(id));
   for (auto it = rs.begin(); it != rs.end(); ++it) {
     int user_id = *it;
-    sql << "insert into notifications (contractor_id, user_id, is_read)"
-           "  values(:contractor_id, :user_id, false)", soci::use(id), soci::use(user_id);
+    sql << "insert into notifications (contractor_id, user_id, is_read, description)"
+           "  values(:contractor_id, :user_id, false, :description)", soci::use(id), soci::use(user_id), soci::use(description);
   }
 }

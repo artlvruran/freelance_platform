@@ -24,26 +24,30 @@ namespace soci {
   template<> struct type_conversion<Employee> {
     typedef values base_type;
 
-    static void from_base(values const& v, indicator ind, Employee& p) {
+    static void from_base(values const& values, indicator ind, Employee& employee) {
       if (ind == i_null) return;
       try {
-        p.id = v.get<int>("id", 0);
-        p.username = v.get<std::string>("username", {});
-        p.email = v.get<std::string>("email", {});
-        p.password = v.get<std::string>("password", {});
-      } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+        employee.id = values.get<int>("id", 0);
+        employee.username = values.get<std::string>("username", {});
+        employee.email = values.get<std::string>("email", {});
+        employee.password = values.get<std::string>("password", {});
+      } catch (std::exception const& exception) {
+        std::cerr << exception.what() << std::endl;
+      }
     }
 
-    static void to_base(const Employee& p, values& v, indicator& ind) {
+    static void to_base(const Employee& employee, values& values, indicator& ind) {
       try {
-        v.set("id", p.id);
-        v.set("username", p.username);
-        v.set("email", p.email);
-        v.set("password", p.password);
-        v.set("role", std::string("employee"));
+        values.set("id", employee.id);
+        values.set("username", employee.username);
+        values.set("email", employee.email);
+        values.set("password", employee.password);
+        values.set("role", std::string("employee"));
         ind = i_ok;
         return;
-      } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const& exception) {
+        std::cerr << exception.what() << std::endl;
+      }
       ind = i_null;
     }
   };
