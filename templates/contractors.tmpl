@@ -9,15 +9,15 @@
         <div class="col">
             <div class="card h-100 rowelement rounded-0">
                 <img src="/media/images/<%= contractor.cover %>" class="card-img-top card-cover rounded-0">
-                <div class="right">
-                    <img src="/media/images/<%= contractor.avatar %>" class="avatar">
-                </div>
-                <div class="card-body">
+                <div class="card-body" style="display: flex;">
                     <h2 class="card-title">
                         <a class="nav-link" href="/users/<%= contractor.id %>">
                             <%= contractor.fullname %>
                         </a>
                     </h2>
+                    <div class="right">
+                        <img src="/media/images/<%= contractor.avatar %>" class="avatar">
+                    </div>
                 </div>
             </div>
         </div>

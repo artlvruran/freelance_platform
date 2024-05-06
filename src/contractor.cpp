@@ -48,12 +48,11 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   bid.advance(e);
 }
 
-void Contractor::add_project(Project &project) {
+void Contractor::add_project(Project &project) const {
   std::string src = "dbname=";
   src += db_source;
   soci::session sql("sqlite3", src);
-  sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description)"
-         "values(:name, %d, :state, :location, :wage, :description)") % id).str(), soci::use(project);
+  project.load(id);
   sql << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
@@ -69,18 +68,18 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
          "where employee_id == :id and project_id == :id1", soci::use(employee.id), soci::use(project.id);
 }
 
-void Contractor::end_project(Project& project) {
+void Contractor::end_project(Project& project) const {
   project.advance(event::completed);
   notify_observers("Project " + project.name + " has been ended.");
 }
 
-void Contractor::start_project_hiring(Project& project) {
+void Contractor::start_project_hiring(Project& project) const {
   project.advance(event::start);
   notify_observers("Project " + project.name + " has started its hiring.");
 }
 
 
-void Contractor::end_project_hiring(Project& project) {
+void Contractor::end_project_hiring(Project& project) const {
   project.advance(event::hired);
   notify_observers("Project " + project.name + " has finished its hiring.");
 }
@@ -107,8 +106,7 @@ void Contractor::notify_observers(std::string description) const {
   src += db_source;
   soci::session sql("sqlite3", src);
   soci::rowset<int> rs = (sql.prepare << "select user_id from subscriptions where contractor_id = :id", soci::use(id));
-  for (auto it = rs.begin(); it != rs.end(); ++it) {
-    int user_id = *it;
+  for (int user_id : rs) {
     sql << "insert into notifications (contractor_id, user_id, is_read, description)"
            "  values(:contractor_id, :user_id, false, :description)", soci::use(id), soci::use(user_id), soci::use(description);
   }

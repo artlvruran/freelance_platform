@@ -1,0 +1,12 @@
+<% c++ #include "data/tmpl_add_project.h" %>
+<% skin defskin %>
+<% view AddTask uses Data::AddTask extends Master%>
+<% template page_content() %>
+
+<form action="" method="post" class="custom-form"> <% csrf %>
+    <% form as_p add_project_form %>
+</form>
+
+<% end template %>
+<% end view %>
+<% end skin %>

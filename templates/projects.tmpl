@@ -2,10 +2,24 @@
 <% skin defskin %>
 <% view Projects uses Data::Projects extends Master%>
 <% template page_content() %>
+<ul class="list-group list-group-horizontal-lg">
+    <li class="list-group-item">
+        <a href="/projects">All</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=1">Tasks</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=2">Vacancies</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=3">Contests</a>
+    </li>
+</ul>
 <div class="row">
     <% foreach project in projects_page.projects %>
         <% item %>
-        <div class="card mb-3 rounded-0 p-0" style="width: 30%; height: 200px; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
+        <div class="card mb-3 rounded-0 p-0" style="width: 30%; height: auto; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
             <div class="row m-0" style="height: 100%">
                 <div class="col p-0" style="height: 100%">
                     <img class="project-author-avatar" src="/media/images/<%= project.second.avatar %>">
@@ -40,6 +54,21 @@
                                     <% end %>
                                 </small>
                             </p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <small class="text-muted">
+                                        It is a <% if (project.first.type == "task") %>
+                                                    regular task.
+                                                 <% elif (project.first.type == "long") %>
+                                                    vacancy.
+                                                 <% else %>
+                                                    contest.
+                                                 <% end %>
+                                    </small>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

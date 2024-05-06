@@ -249,7 +249,6 @@ img {
 .right {
     position: absolute;
     right: 16px;
-    margin-top: 85%;
 }
 .avatar {
     border-radius: 100%;

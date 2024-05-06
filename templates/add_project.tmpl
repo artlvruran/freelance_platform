@@ -3,10 +3,15 @@
 <% view AddProject uses Data::AddProject extends Master%>
 <% template page_content() %>
 
-<form action="" method="post" class="custom-form"> <% csrf %>
-<% form as_p add_project_form %>
-</form>
-
+<div style="
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;">
+    <a href="/projects/add_project/task" role="button" class="btn btn-primary btn-lg rounded-0">Create Task</a>
+    <a href="/projects/add_project/long" role="button" class="btn btn-primary btn-lg rounded-0">Create Vacancy</a>
+    <a href="/projects/add_project/contest" role="button" class="btn btn-primary btn-lg rounded-0">Create Contest</a>
+</div>
 <% end template %>
 <% end view %>
 <% end skin %>

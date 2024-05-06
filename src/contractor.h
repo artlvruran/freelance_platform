@@ -14,12 +14,12 @@ class Contractor : public User {
 
   Contractor() = default;
 
-  void add_project(Project& project);
+  void add_project(Project& project) const;
   void consider_bid(Bid& bid, bid_event e);
-  void fire_worker(const Project& project, const Employee& employee);
-  void end_project(Project& project);
-  void end_project_hiring(Project& project);
-  void start_project_hiring(Project& project);
+  static void fire_worker(const Project& project, const Employee& employee);
+  void end_project(Project& project) const;
+  void end_project_hiring(Project& project) const;
+  void start_project_hiring(Project& project) const;
   void sign_up();
 
   bool log_in();

@@ -23,6 +23,7 @@
 #include "src/constants.h"
 #include "src/message.h"
 #include <fstream>
+#include <any>
 
 template<typename T>
 void add_menu(T& object, cppcms::application& app) {
@@ -369,6 +370,8 @@ class Users : public cppcms::application {
                "where id = :id", soci::use(cover_name), soci::use(current_user.id);
 
       }
+      response().set_redirect_header("/users/" + id);
+      return;
     }
 
 
@@ -424,6 +427,15 @@ class Projects : public cppcms::application {
     dispatcher().assign("/bid_on/(.+)", &Projects::bid_on, this, 1);
     mapper().assign("/bid_on/{1}");
 
+    dispatcher().assign("/add_project/task", &Projects::add_task, this);
+    mapper().assign("/add_project/task");
+
+    dispatcher().assign("/add_project/long", &Projects::add_long, this);
+    mapper().assign("/add_project/long");
+
+    dispatcher().assign("/add_project/contest", &Projects::add_contest, this);
+    mapper().assign("/add_project/contest");
+
     dispatcher().assign("/add_project", &Projects::add_project, this);
     mapper().assign("/add_project");
 
@@ -444,6 +456,13 @@ class Projects : public cppcms::application {
   }
 
   virtual void projects() {
+    std::string paramlist = request().query_string();
+    if (!paramlist.empty()) {
+      auto param = paramlist.substr(5, paramlist.size() - 5);
+      projects_filter(param);
+      return;
+    }
+
     Data::Projects mn;
 
     add_menu(mn, *this);
@@ -457,11 +476,53 @@ class Projects : public cppcms::application {
       Contractor contractor;
       sql << "select * from users where id = :contractor_id and role='contractor'",
              soci::use(it->contractor_id), soci::into(contractor);
-      all_projects.push_back({*it, contractor});
+      all_projects.emplace_back(*it, contractor);
     }
     mn.projects_page.projects = all_projects;
 
     render("Projects", mn);
+  }
+
+  template<typename ProjectType>
+  std::vector<std::pair<ProjectType, Contractor>> get_all_projects(const std::string& tp) {
+    std::string src = "dbname=";
+    src += db_source;
+    soci::session sql("sqlite3", src);
+    soci::rowset<ProjectType> projects = (sql.prepare << "select * from projects where type=\"" + tp + "\"");
+    std::vector<std::pair<ProjectType, Contractor>> all_projects;
+    for (auto it = projects.begin(); it != projects.end(); ++it) {
+      Contractor contractor;
+      sql << "select * from users where id = :contractor_id and role='contractor'",
+          soci::use(it->contractor_id), soci::into(contractor);
+      all_projects.emplace_back(*it, contractor);
+    }
+    return all_projects;
+  }
+
+  template<typename ProjectType, typename ViewType>
+  ViewType filter(const std::string& tp) {
+    auto all_projects = get_all_projects<ProjectType>(tp);
+    ViewType view;
+    view.projects_page.projects = all_projects;
+    add_menu(view, *this);
+    return view;
+  }
+
+  virtual void projects_filter(std::string number) {
+    std::string tp;
+    if (number == "1") {
+      tp = "task";
+      auto view = filter<Task, Data::Tasks>(tp);
+      render("Tasks", view);
+    } else if (number == "2") {
+      tp = "long";
+      auto view = filter<LongTermJob, Data::Longs>(tp);
+      render("Longs", view);
+    } else {
+      tp = "contest";
+      auto view = filter<Contest, Data::Contests>(tp);
+      render("Contests", view);
+    }
   }
 
   virtual void project(std::string id) {
@@ -575,17 +636,49 @@ class Projects : public cppcms::application {
   virtual void add_project() {
     Data::AddProject addpr;
     add_menu(addpr, *this);
+
+    render("AddProject", addpr);
+  }
+
+  static void get_fields(Task& project, Data::AddTask& view) {
+    project.name = view.add_project_form.name.value();
+    project.description = view.add_project_form.description.value();
+    project.wage = view.add_project_form.wage.value();
+    project.location = view.add_project_form.location.value();
+    project.state = std::make_unique<NotStarted>();
+  }
+
+  static void get_fields(LongTermJob& project, Data::AddLong& view) {
+    project.name = view.add_project_form.name.value();
+    project.description = view.add_project_form.description.value();
+    project.wage = view.add_project_form.wage.value();
+    project.location = view.add_project_form.location.value();
+    project.state = std::make_unique<NotStarted>();
+    project.specialization = view.add_project_form.specialization.value();
+    project.format = (view.add_project_form.format.selected_id() == "0" ? "remote" : "office");
+  }
+
+  static void get_fields(Contest& project, Data::AddContest& view) {
+    project.name = view.add_project_form.name.value();
+    project.description = view.add_project_form.description.value();
+    project.wage = view.add_project_form.wage.value();
+    project.location = view.add_project_form.location.value();
+    project.state = std::make_unique<NotStarted>();
+    project.start_at = view.add_project_form.start_at.value();
+    project.end_at = view.add_project_form.end_at.value();
+  }
+
+  virtual void add_task() {
+    Data::AddTask addpr;
+    add_menu(addpr, *this);
+
     if (request().request_method() == "POST") {
       addpr.add_project_form.load(context());
       if (addpr.add_project_form.validate()) {
         if (session().is_set("role") && session()["role"] == "contractor") {
           Contractor contractor;
-          Project project;
-          project.name = addpr.add_project_form.name.value();
-          project.description = addpr.add_project_form.description.value();
-          project.wage = addpr.add_project_form.wage.value();
-          project.location = addpr.add_project_form.location.value();
-          project.state = std::make_unique<Preparing>();
+          Task project;
+          get_fields(project, addpr);
 
           std::string src = "dbname=";
           src += db_source;
@@ -603,7 +696,69 @@ class Projects : public cppcms::application {
       }
     }
 
-    render("AddProject", addpr);
+    render("AddTask", addpr);
+  }
+
+  virtual void add_long() {
+    Data::AddLong addpr;
+    add_menu(addpr, *this);
+
+    if (request().request_method() == "POST") {
+      addpr.add_project_form.load(context());
+      if (addpr.add_project_form.validate()) {
+        if (session().is_set("role") && session()["role"] == "contractor") {
+          Contractor contractor;
+          LongTermJob project;
+          get_fields(project, addpr);
+
+          std::string src = "dbname=";
+          src += db_source;
+          soci::session sql("sqlite3", src);
+          sql << "select * from users where role='contractor' and username=:username",
+              soci::use(session()["username"]), soci::into(contractor);
+
+          contractor.add_project(project);
+
+          response().set_redirect_header("/projects");
+          return;
+        }
+        response().set_redirect_header("/");
+        return;
+      }
+    }
+
+    render("AddLong", addpr);
+  }
+
+  virtual void add_contest() {
+    Data::AddContest addpr;
+    add_menu(addpr, *this);
+
+    if (request().request_method() == "POST") {
+      addpr.add_project_form.load(context());
+      if (addpr.add_project_form.validate()) {
+        if (session().is_set("role") && session()["role"] == "contractor") {
+          Contractor contractor;
+          Contest project;
+          get_fields(project, addpr);
+
+          std::string src = "dbname=";
+          src += db_source;
+          soci::session sql("sqlite3", src);
+          sql << "select * from users where role='contractor' and username=:username",
+              soci::use(session()["username"]), soci::into(contractor);
+
+          contractor.add_project(project);
+
+          response().set_redirect_header("/projects");
+          return;
+        }
+        response().set_redirect_header("/");
+        return;
+      }
+    }
+
+    render("AddContest", addpr);
   }
 
   virtual void advance(std::string id) {
