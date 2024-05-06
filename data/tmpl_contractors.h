@@ -4,7 +4,7 @@
 #pragma once
 
 #include <cppcms/view.h>
-#include "../src/contractor.h"
+#include "../src/models/contractor.h"
 #include "tmpl_master.h"
 
 namespace Data {

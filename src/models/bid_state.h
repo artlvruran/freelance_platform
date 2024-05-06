@@ -19,17 +19,17 @@ struct BidState {
 struct BidStateConsidering : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
-  std::string str() const;
+  std::string str() const override;
 };
 
 struct BidStateApproved : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
-  std::string str() const;
+  std::string str() const override;
 };
 
 struct BidStateRejected : BidState {
   using BidState::BidState;
   std::unique_ptr<BidState> on_event(bid_event e) override;
-  std::string str() const;
+  std::string str() const override;
 };

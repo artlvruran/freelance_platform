@@ -6,7 +6,7 @@
 #pragma once
 
 #include <cppcms/view.h>
-#include "../src/employee.h"
+#include "../src/models/employee.h"
 #include "tmpl_master.h"
 
 namespace Data {

@@ -69,14 +69,14 @@ class Project {
     return *this;
   }
 
-  void advance(event e);
+  void advance(event exception);
 
-  virtual void load(int contractor_id) const {
+  virtual void load(int con_id) const {
     std::string src = "dbname=";
     src += db_source;
     soci::session sql("sqlite3", src);
     sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description)"
-                          "values(:name, %d, :state, :location, :wage, :description)") % contractor_id).str(), soci::use(*this);
+                          "values(:name, %d, :state, :location, :wage, :description)") % con_id).str(), soci::use(*this);
   };
  private:
 };
@@ -119,46 +119,46 @@ namespace soci {
 template<>
   struct type_conversion<Project> {
     typedef values base_type;
-    static void from_base(values const &v, indicator ind, Project &p) {
+    static void from_base(values const &values, indicator ind, Project &project) {
       if (ind == i_null) return;
       try {
-        p.id = v.get<int>("id", 0);
-        p.name = v.get<std::string>("name", {});
-        p.contractor_id = v.get<int>("contractor_id", 0);
+        project.id = values.get<int>("id", 0);
+        project.name = values.get<std::string>("name", {});
+        project.contractor_id = values.get<int>("contractor_id", 0);
 
-        int int_status = v.get<int>("state", 0);
+        int int_status = values.get<int>("state", 0);
         if (int_status == 0) {
-          p.state = std::make_unique<NotStarted>();
+          project.state = std::make_unique<NotStarted>();
         } else if (int_status == 1) {
-          p.state = std::make_unique<Preparing>();
+          project.state = std::make_unique<Preparing>();
         } else if (int_status == 2) {
-          p.state = std::make_unique<Processing>();
+          project.state = std::make_unique<Processing>();
         } else {
-          p.state = std::make_unique<Completed>();
+          project.state = std::make_unique<Completed>();
         }
 
-        p.location = v.get<std::string>("location", {});
-        p.wage = v.get<double>("wage", 0);
-        p.description = v.get<std::string>("description", {});
-        p.type = v.get<std::string>("type", {});
+        project.location = values.get<std::string>("location", {});
+        project.wage = values.get<double>("wage", 0);
+        project.description = values.get<std::string>("description", {});
+        project.type = values.get<std::string>("type", {});
 
-      } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const &exception) { std::cerr << exception.what() << std::endl; }
     }
 
-    static void to_base(const Project &p, values &v, indicator &ind) {
+    static void to_base(const Project &project, values &values, indicator &ind) {
       try {
-        v.set("id", p.id);
-        v.set("name", p.name);
-        v.set("state", p.state->integer());
-        v.set("contractor_id", p.contractor_id);
-        v.set("location", p.location);
-        v.set("wage", p.wage);
-        v.set("description", p.description);
-        v.set("type", p.type);
+        values.set("id", project.id);
+        values.set("name", project.name);
+        values.set("state", project.state->integer());
+        values.set("contractor_id", project.contractor_id);
+        values.set("location", project.location);
+        values.set("wage", project.wage);
+        values.set("description", project.description);
+        values.set("type", project.type);
 
         ind = i_ok;
         return;
-      } catch (std::exception const &e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const &exception) { std::cerr << exception.what() << std::endl; }
       ind = i_null;
     }
   };
@@ -166,47 +166,47 @@ template<>
 template<>
 struct type_conversion<Task> {
   typedef values base_type;
-  static void from_base(values const &v, indicator ind, Task &p) {
-    type_conversion<Project>::from_base(v, ind, p);
+  static void from_base(values const &values, indicator ind, Task &project) {
+    type_conversion<Project>::from_base(values, ind, project);
   }
 
-  static void to_base(const Task &p, values &v, indicator &ind) {
-    type_conversion<Project>::to_base(p, v, ind);
-    v.set("type", std::string("task"));
+  static void to_base(const Task &project, values &values, indicator &ind) {
+    type_conversion<Project>::to_base(project, values, ind);
+    values.set("type", std::string("task"));
   }
 };
 
 template<>
 struct type_conversion<LongTermJob> {
   typedef values base_type;
-  static void from_base(values const &v, indicator ind, LongTermJob &p) {
-    type_conversion<Project>::from_base(v, ind, p);
-    p.specialization = v.get<std::string>("specialization", {});
-    p.format = v.get<std::string>("format", {});
+  static void from_base(values const &values, indicator ind, LongTermJob &project) {
+    type_conversion<Project>::from_base(values, ind, project);
+    project.specialization = values.get<std::string>("specialization", {});
+    project.format = values.get<std::string>("format", {});
   }
 
-  static void to_base(const LongTermJob &p, values &v, indicator &ind) {
-    type_conversion<Project>::to_base(p, v, ind);
-    v.set("specialization", p.specialization);
-    v.set("format", p.format);
-    v.set("type", std::string("long"));
+  static void to_base(const LongTermJob &project, values &values, indicator &ind) {
+    type_conversion<Project>::to_base(project, values, ind);
+    values.set("specialization", project.specialization);
+    values.set("format", project.format);
+    values.set("type", std::string("long"));
   }
 };
 
 template<>
 struct type_conversion<Contest> {
   typedef values base_type;
-  static void from_base(values const &v, indicator ind, Contest &p) {
-    type_conversion<Project>::from_base(v, ind, p);
-    p.start_at = v.get<std::string>("start_at", {});
-    p.end_at = v.get<std::string>("end_at", {});
+  static void from_base(values const &values, indicator ind, Contest &project) {
+    type_conversion<Project>::from_base(values, ind, project);
+    project.start_at = values.get<std::string>("start_at", {});
+    project.end_at = values.get<std::string>("end_at", {});
   }
 
-  static void to_base(const Contest &p, values &v, indicator &ind) {
-    type_conversion<Project>::to_base(p, v, ind);
-    v.set("start_at", p.start_at);
-    v.set("end_at", p.end_at);
-    v.set("type", std::string("contest"));
+  static void to_base(const Contest &project, values &values, indicator &ind) {
+    type_conversion<Project>::to_base(project, values, ind);
+    values.set("start_at", project.start_at);
+    values.set("end_at", project.end_at);
+    values.set("type", std::string("contest"));
   }
 };
 }

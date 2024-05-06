@@ -6,7 +6,7 @@
 #include <cppcms/view.h>
 #include <cppcms/form.h>
 #include "tmpl_master.h"
-#include "../src/message.h"
+#include "../src/models/message.h"
 
 using namespace cppcms;
 

@@ -6,8 +6,8 @@
 #pragma once
 
 #include <cppcms/view.h>
-#include "../src/project.h"
-#include "../src/contractor.h"
+#include "../src/models/project.h"
+#include "../src/models/contractor.h"
 #include "tmpl_master.h"
 namespace Data {
 
