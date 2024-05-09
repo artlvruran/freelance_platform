@@ -17,6 +17,10 @@
     * #### BidStateApproved - принята
     * #### BidStateRejected - отклонена
 ![diagrams/frealnceplatform Class diagram.png](https://github.com/artlvruran/freelance_platform/blob/checkpoint_1/diagrams/frealnceplatform%20Class%20diagram.png)
+# Паттерны 
+  * Observer (функционал подписок)
+  * State (состояния заказов и состояния заявок)
+  * Factory (ProjectFactory)
 # Сценарии использования
 - Для взаимодействия с системой пользователь должен пройти регистрацию, и выбрать нужную роль: заказчик или исполнитель.
 - Любой пользователь может подписаться на (отписаться от) заказчика.
