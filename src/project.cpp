@@ -5,6 +5,7 @@
 #include "project.h"
 #include "sqlite3.h"
 #include "constants.h"
+#include "database.h"
 #include <boost/format.hpp>
 
 
@@ -15,11 +16,8 @@ void Project::advance(event e) {
   }
   state = std::move(new_status);
 
-  std::string src = "dbname=";
-  src += db_source;
-  soci::session sql("sqlite3", src);
-  sql << "update projects "
+  DataBase db(db_source);
+  db << "update projects "
          "set state = :state "
          "where id = :id", soci::use(*this);
-  sql.close();
 }

@@ -41,36 +41,40 @@ namespace soci {
 template<> struct type_conversion<Bid> {
   typedef values base_type;
 
-  static void from_base(values const& v, indicator ind, Bid& p) {
+  static void from_base(values const& values, indicator ind, Bid& bid) {
     if (ind == i_null) return;
     try {
-      p.id = v.get<int>("id", 0);
-      p.project_id = v.get<int>("project_id", 0);
-      p.employee_id = v.get<int>("employee_id", 0);
+      bid.id = values.get<int>("id", 0);
+      bid.project_id = values.get<int>("project_id", 0);
+      bid.employee_id = values.get<int>("employee_id", 0);
 
-      auto st = v.get<std::string>("state", {});
+      auto st = values.get<std::string>("state", {});
 
       if (st == "considering") {
-        p.state = std::make_unique<BidStateConsidering>();
+        bid.state = std::make_unique<BidStateConsidering>();
       } else if (st == "approved") {
-        p.state = std::make_unique<BidStateApproved>();
+        bid.state = std::make_unique<BidStateApproved>();
       } else {
-        p.state = std::make_unique<BidStateRejected>();
+        bid.state = std::make_unique<BidStateRejected>();
       }
 
-    } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+    } catch (std::exception const& exception) {
+      std::cerr << exception.what() << std::endl;
+    }
   }
 
-  static void to_base(const Bid& p, values& v, indicator& ind) {
+  static void to_base(const Bid& bid, values& values, indicator& ind) {
     try {
-      v.set("id", p.id);
-      v.set("project_id", p.project_id);
-      v.set("employee_id", p.employee_id);
-      v.set("state", p.state->str());
+      values.set("id", bid.id);
+      values.set("project_id", bid.project_id);
+      values.set("employee_id", bid.employee_id);
+      values.set("state", bid.state->str());
 
       ind = i_ok;
       return;
-    } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+    } catch (std::exception const& exception) {
+      std::cerr << exception.what() << std::endl;
+    }
     ind = i_null;
   }
 };

@@ -1,7 +1,6 @@
 //
 // Created by kirill on 26.02.24.
 //
-
 #pragma once
 #include "user.h"
 #include "db_pool.h"
@@ -15,9 +14,10 @@ class Contractor : public User {
   Contractor() = default;
 
   void add_project(Project& project);
-  void consider_bid(Bid& bid, bid_event e);
+  void consider_bid(Bid& bid, bid_event event);
   void fire_worker(const Project& project, const Employee& employee);
   void end_project(Project& project);
+  void start_project_hiring(Project& project);
   void end_project_hiring(Project& project);
   void sign_up();
 
@@ -34,26 +34,30 @@ namespace soci {
   template<> struct type_conversion<Contractor> {
     typedef values base_type;
 
-    static void from_base(values const& v, indicator ind, Contractor& p) {
+    static void from_base(values const& values, indicator ind, Contractor& contractor) {
       if (ind == i_null) return;
       try {
-        p.id = v.get<int>("id", 0);
-        p.username = v.get<std::string>("username", {});
-        p.email = v.get<std::string>("email", {});
-        p.password = v.get<std::string>("password", {});
-      } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+        contractor.id = values.get<int>("id", 0);
+        contractor.username = values.get<std::string>("username", {});
+        contractor.email = values.get<std::string>("email", {});
+        contractor.password = values.get<std::string>("password", {});
+      } catch (std::exception const & exception) {
+        std::cerr << exception.what() << std::endl;
+      }
     }
 
-    static void to_base(const Contractor& p, values& v, indicator& ind) {
+    static void to_base(const Contractor& contractor, values& values, indicator& ind) {
       try {
-        v.set("id", p.id);
-        v.set("username", p.username);
-        v.set("email", p.email);
-        v.set("password", p.password);
-        v.set("role", std::string("contractor"));
+        values.set("id", contractor.id);
+        values.set("username", contractor.username);
+        values.set("email", contractor.email);
+        values.set("password", contractor.password);
+        values.set("role", std::string("contractor"));
         ind = i_ok;
         return;
-      } catch (std::exception const & e) { std::cerr << e.what() << std::endl; }
+      } catch (std::exception const& exception) {
+        std::cerr << exception.what() << std::endl;
+      }
       ind = i_null;
     }
   };

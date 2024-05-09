@@ -1,7 +1,6 @@
 //
 // Created by kirill on 08.03.24.
 //
-
 #pragma once
 #include <iostream>
 #include <memory>

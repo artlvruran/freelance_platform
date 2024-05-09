@@ -4,13 +4,12 @@
 #include "user.h"
 #include <soci/soci.h>
 #include "constants.h"
+#include "database.h"
 #include "chrono"
 
 void User::notify(int contractor_id) {
-  std::string src = "dbname=";
-  src += db_source;
-  soci::session sql("sqlite3", src);
-  sql << "insert into notifications (contractor_id, user_id, is_read)"
+  DataBase db(db_source);
+  db << "insert into notifications (contractor_id, user_id, is_read)"
          "  values(:contractor_id, :user_id, false)", soci::use(contractor_id), soci::use(id);
 }
 

@@ -14,7 +14,10 @@
 #include "data/tmpl_user.h"
 #include "src/employee.h"
 #include "src/contractor.h"
+#include "src/project.h"
 #include "src/constants.h"
+#include "src/database.h"
+#include <string>
 
 class WebSite : public cppcms::application {
  public:
