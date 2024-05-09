@@ -20,7 +20,8 @@ add_executable(FreelancePlatform main.cpp
         src/bid_state.cpp
         src/bid.cpp
         src/db_pool.h
-        src/user.cpp)
+        src/user.cpp
+        src/database.h)
 add_compile_options(-l sqlite3)
 add_compile_options(-l soci_sqlite3)
 add_compile_options(-l soci_core)
