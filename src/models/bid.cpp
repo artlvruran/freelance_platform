@@ -1,9 +1,9 @@
 //
 // Created by kirill on 11.03.24.
 //
-#include "sqlite3.h"
 #include "bid.h"
 #include "constants.h"
+#include "database.h"
 #include <iostream>
 #include <boost/format.hpp>
 
@@ -14,10 +14,8 @@ void Bid::advance(bid_event e) {
   }
   state = std::move(new_status);
 
-  std::string src = "dbname=";
-  src += db_source;
-  soci::session sql("sqlite3", src);
-  sql << "update bids "
+  DataBase db(db_source);
+  db << "update bids "
          "set state = :state "
          "where id = :id", soci::use(*this);
 }

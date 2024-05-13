@@ -15,7 +15,7 @@ class Contractor : public User {
   Contractor() = default;
 
   void add_project(Project& project) const;
-  void consider_bid(Bid& bid, bid_event exception);
+  void consider_bid(Bid& bid, bid_event event);
   static void fire_worker(const Project& project, const Employee& employee);
   void end_project(Project& project) const;
   void end_project_hiring(Project& project) const;
@@ -61,7 +61,7 @@ namespace soci {
 
         ind = i_ok;
         return;
-      } catch (std::exception const & exception) {
+      } catch (std::exception const& exception) {
         std::cerr << exception.what() << std::endl;
       }
       ind = i_null;

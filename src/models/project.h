@@ -11,6 +11,7 @@
 #include "db_pool.h"
 #include "constants.h"
 #include "boost/format.hpp"
+#include "../database.h"
 
 class Project {
  public:
@@ -72,10 +73,8 @@ class Project {
   void advance(event exception);
 
   virtual void load(int con_id) const {
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description)"
+    DataBase db(db_source);
+    db << (boost::format("insert into projects (name, contractor_id, state, location, wage, description)"
                           "values(:name, %d, :state, :location, :wage, :description)") % con_id).str(), soci::use(*this);
   };
  private:
@@ -87,10 +86,8 @@ class LongTermJob : public Project {
   std::string specialization;
   std::string format;
   void load(int contractor_id) const override {
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description, specialization, format, type)"
+    DataBase db(db_source);
+    db << (boost::format("insert into projects (name, contractor_id, state, location, wage, description, specialization, format, type)"
                           "values(:name, %d, :state, :location, :wage, :description, :specialization, :format, 'long')") % contractor_id).str(), soci::use(*this);
   }
 };
@@ -106,10 +103,8 @@ class Contest : public Project {
   std::string start_at;
   std::string end_at;
   void load(int contractor_id) const override {
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    sql << (boost::format("insert into projects (name, contractor_id, state, location, wage, description, start_at, end_at, type)"
+    DataBase db(db_source);
+    db << (boost::format("insert into projects (name, contractor_id, state, location, wage, description, start_at, end_at, type)"
                           "values(:name, %d, :state, :location, :wage, :description, :start_at, :end_at, 'contest')") % contractor_id).str(), soci::use(*this);
   }
 };

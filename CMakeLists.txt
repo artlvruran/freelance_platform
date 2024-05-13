@@ -29,7 +29,8 @@ add_executable(FreelancePlatform main.cpp
         data/tmpl_project.h
         data/tmpl_add_project.h
         data/tmpl_contractors.h
-        data/tmpl_user.h)
+        data/tmpl_user.h
+        src/database.h)
 add_compile_options(-l sqlite3)
 add_compile_options(-l soci_sqlite3)
 add_compile_options(-l soci_core)
