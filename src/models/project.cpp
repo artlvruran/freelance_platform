@@ -3,9 +3,7 @@
 //
 
 #include "project.h"
-#include "sqlite3.h"
 #include "constants.h"
-#include "database.h"
 #include <boost/format.hpp>
 
 

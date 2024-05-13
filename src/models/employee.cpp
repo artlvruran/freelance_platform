@@ -2,10 +2,8 @@
 // Created by kirill on 26.02.24.
 //
 #include "employee.h"
-#include "sqlite3.h"
 #include "constants.h"
 #include "../database.h"
-#include <boost/format.hpp>
 
 void Employee::sign_up() {
   DataBase db(db_source);

@@ -4,7 +4,6 @@
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"
-#include "../database.h"
 #include <boost/format.hpp>
 #include <string>
 
@@ -40,7 +39,7 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   bid.advance(e);
 }
 
-void Contractor::add_project(Project &project) {
+void Contractor::add_project(Project &project) const {
   DataBase db(db_source);
   db << (boost::format("insert into projects (name, contractor_id, state)"
          "values(:name, %d, :state)") % id).str(), soci::use(project);
@@ -62,7 +61,7 @@ void Contractor::end_project(Project& project) const {
   notify_observers("Project " + project.name + " has been ended.");
 }
 
-void Contractor::start_project_hiring(Project& project) {
+void Contractor::start_project_hiring(Project& project) const {
   project.advance(event::start);
   notify_observers("Project " + project.name + " has started its hiring.");
 }
