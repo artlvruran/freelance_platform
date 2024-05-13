@@ -78,14 +78,12 @@ class Projects : public cppcms::application {
 
     add_menu(mn, *this);
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    soci::rowset<Project> projects = (sql.prepare << "select * from projects");
+    DataBase db(db_source);
+    soci::rowset<Project> projects = (db.prepare("select * from projects"));
     std::vector<std::pair<Project, Contractor>> all_projects;
     for (auto& project : projects) {
       Contractor contractor;
-      sql << "select * from users where id = :contractor_id and role='contractor'",
+      db << "select * from users where id = :contractor_id and role='contractor'",
           soci::use(project.contractor_id), soci::into(contractor);
       all_projects.emplace_back(project, contractor);
     }
@@ -96,14 +94,12 @@ class Projects : public cppcms::application {
 
   template<typename ProjectType>
   std::vector<std::pair<ProjectType, Contractor>> get_all_projects(const std::string& tp) {
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    soci::rowset<ProjectType> projects = (sql.prepare << "select * from projects where type=\"" + tp + "\"");
+    DataBase db(db_source);
+    soci::rowset<ProjectType> projects = (db.prepare("select * from projects where type=\"" + tp + "\""));
     std::vector<std::pair<ProjectType, Contractor>> all_projects;
     for (auto it = projects.begin(); it != projects.end(); ++it) {
       Contractor contractor;
-      sql << "select * from users where id = :contractor_id and role='contractor'",
+      db << "select * from users where id = :contractor_id and role='contractor'",
           soci::use(it->contractor_id), soci::into(contractor);
       all_projects.emplace_back(*it, contractor);
     }
@@ -141,11 +137,9 @@ class Projects : public cppcms::application {
 
     add_menu(pr, *this);
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
+    DataBase db(db_source);
     Project project;
-    sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+    db << "select * from projects where id=:id", soci::use(id), soci::into(project);
 
     pr.project_page.project = project;
     if (session().is_set("role")) {
@@ -153,11 +147,11 @@ class Projects : public cppcms::application {
         pr.project_page.is_employee = true;
         soci::indicator ind;
         Bid bid;
-        sql << "select * from bids where project_id=:project_id and employee_id=("
+        db << "select * from bids where project_id=:project_id and employee_id=("
                "select id from users where role='employee' and username=:username"
                ")",
             soci::use(id), soci::use(session()["username"]), soci::into(bid, ind);
-        if (sql.got_data() && ind == soci::i_ok) {
+        if (db.got_data() && ind == soci::i_ok) {
           pr.project_page.is_bid_created = true;
           pr.project_page.bids.emplace_back(bid, get_employee(*this));
         }
@@ -165,15 +159,15 @@ class Projects : public cppcms::application {
         pr.project_page.is_employee = false;
 
         int contractor_id;
-        sql << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
+        db << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
 
         Contractor contractor;
-        sql << "select * from users where role='contractor' and username=:username",
+        db << "select * from users where role='contractor' and username=:username",
             soci::use(session()["username"]), soci::into(contractor);
 
         if (contractor_id == contractor.id) {
           pr.project_page.has_right = true;
-          soci::rowset<Bid> rs = (sql.prepare << "select * from bids where project_id = :id", soci::use(id));
+          soci::rowset<Bid> rs = (db.prepare("select * from bids where project_id = :id"), soci::use(id));
           for (auto& bid : rs) {
             pr.project_page.bids.emplace_back(bid, get_employee_by_id(std::to_string(bid.employee_id)));
           }
@@ -188,14 +182,12 @@ class Projects : public cppcms::application {
   virtual void bid_on(std::string id) {
     if (session().is_set("role")) {
       if (session()["role"] == "employee") {
-        std::string src = "dbname=";
-        src += db_source;
-        soci::session sql("sqlite3", src);
+        DataBase db(db_source);
         Project project;
-        sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+        db << "select * from projects where id=:id", soci::use(id), soci::into(project);
 
         Employee employee;
-        sql << "select * from users where role='employee' and username=:username",
+        db << "select * from users where role='employee' and username=:username",
             soci::use(session()["username"]), soci::into(employee);
 
         employee.create_bid(project.id);
@@ -217,22 +209,20 @@ class Projects : public cppcms::application {
       } else {
         int contractor_id;
 
-        std::string src = "dbname=";
-        src += db_source;
-        soci::session sql("sqlite3", src);
-        sql << "select contractor_id from projects where id=("
+        DataBase db(db_source);
+        db << "select contractor_id from projects where id=("
                "select project_id from bids where id=:bid_id"
                ")", soci::use(bid_id), soci::into(contractor_id);
 
         Contractor contractor;
-        sql << "select * from users where role='contractor' and username=:username",
+        db << "select * from users where role='contractor' and username=:username",
             soci::use(session()["username"]), soci::into(contractor);
         if (contractor_id == contractor.id) {
           Bid bid;
-          sql << "select * from bids where id=:bid_id", soci::use(bid_id), soci::into(bid);
+          db << "select * from bids where id=:bid_id", soci::use(bid_id), soci::into(bid);
           contractor.consider_bid(bid, (status == "approve" ? bid_event::approve : bid_event::reject));
           int project_id;
-          sql << "select project_id from bids where id=:bid_id",
+          db << "select project_id from bids where id=:bid_id",
               soci::use(bid_id), soci::into(project_id);
           response().set_redirect_header("/projects/" + std::to_string(project_id));
           return;
@@ -291,10 +281,8 @@ class Projects : public cppcms::application {
           Task project;
           get_fields(project, addpr);
 
-          std::string src = "dbname=";
-          src += db_source;
-          soci::session sql("sqlite3", src);
-          sql << "select * from users where role='contractor' and username=:username",
+          DataBase db(db_source);
+          db << "select * from users where role='contractor' and username=:username",
               soci::use(session()["username"]), soci::into(contractor);
 
           contractor.add_project(project);
@@ -322,10 +310,8 @@ class Projects : public cppcms::application {
           LongTermJob project;
           get_fields(project, addpr);
 
-          std::string src = "dbname=";
-          src += db_source;
-          soci::session sql("sqlite3", src);
-          sql << "select * from users where role='contractor' and username=:username",
+          DataBase db(db_source);
+          db << "select * from users where role='contractor' and username=:username",
               soci::use(session()["username"]), soci::into(contractor);
 
           contractor.add_project(project);
@@ -353,10 +339,8 @@ class Projects : public cppcms::application {
           Contest project;
           get_fields(project, addpr);
 
-          std::string src = "dbname=";
-          src += db_source;
-          soci::session sql("sqlite3", src);
-          sql << "select * from users where role='contractor' and username=:username",
+          DataBase db(db_source);
+          db << "select * from users where role='contractor' and username=:username",
               soci::use(session()["username"]), soci::into(contractor);
 
           contractor.add_project(project);
@@ -375,18 +359,16 @@ class Projects : public cppcms::application {
   virtual void advance(std::string id) {
     if (session().is_set("role")) {
       if (session()["role"] == "contractor") {
-        std::string src = "dbname=";
-        src += db_source;
-        soci::session sql("sqlite3", src);
+        DataBase db(db_source);
         Project project;
-        sql << "select * from projects where id=:id", soci::use(id), soci::into(project);
+        db << "select * from projects where id=:id", soci::use(id), soci::into(project);
 
         Contractor contractor;
-        sql << "select * from users where role='contractor' and username=:username",
+        db << "select * from users where role='contractor' and username=:username",
             soci::use(session()["username"]), soci::into(contractor);
 
         int contractor_id;
-        sql << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
+        db << "select contractor_id from projects where id=:id", soci::use(id), soci::into(contractor_id);
 
         if (contractor_id == contractor.id) {
           if (project.state->integer() == 0) {

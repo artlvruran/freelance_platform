@@ -47,22 +47,20 @@ class Chat : public cppcms::application {
       return;
     }
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
+    DataBase db(db_source);
 
     if (request().request_method() == "POST") {
       view.chat_form.load(context());
       if (view.chat_form.validate()) {
         auto message = view.chat_form.message.value();
-        sql << "insert into messages (sender_id, address_id, text) values(:sender_id, :address_id, :text)",
+        db << "insert into messages (sender_id, address_id, text) values(:sender_id, :address_id, :text)",
             soci::use(current_user.id), soci::use(to_id), soci::use(message);
       }
     }
 
-    soci::rowset<Message> my_messages = (sql.prepare << "select * from messages where sender_id=:sender_id and address_id=:address_id",
+    soci::rowset<Message> my_messages = (db.prepare("select * from messages where sender_id=:sender_id and address_id=:address_id"),
         soci::use(from_id), soci::use(to_id));
-    soci::rowset<Message> their_messages = (sql.prepare << "select * from messages where sender_id=:sender_id and address_id=:address_id",
+    soci::rowset<Message> their_messages = (db.prepare("select * from messages where sender_id=:sender_id and address_id=:address_id"),
         soci::use(to_id), soci::use(from_id));
 
     for (auto& my_message : my_messages) {

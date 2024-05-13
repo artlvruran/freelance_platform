@@ -150,15 +150,13 @@ class WebSite : public cppcms::application {
       std::string paramlist = request().query_string();
       int notification_id = std::stoi(paramlist.substr(11, paramlist.size() - 10));
 
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
+      DataBase db(db_source);
 
       int user_id;
-      sql << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
+      db << "select id from users where username=:username", soci::use(session()["username"]), soci::into(user_id);
 
       int not_user_id;
-      sql << "select user_id from notifications where id=:id", soci::use(notification_id), soci::into(not_user_id);
+      db << "select user_id from notifications where id=:id", soci::use(notification_id), soci::into(not_user_id);
 
       if (user_id == not_user_id) {
         User::read(notification_id);

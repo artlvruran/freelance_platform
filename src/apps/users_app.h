@@ -62,10 +62,8 @@ class Users : public cppcms::application {
 
     add_menu(cntr, *this);
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    soci::rowset<Contractor> contractors = (sql.prepare << "select * from users where role='contractor'");
+    DataBase db(db_source);
+    soci::rowset<Contractor> contractors = (db.prepare("select * from users where role='contractor'"));
     std::vector<Contractor> all_contractors;
     for (auto& contractor : contractors) {
       all_contractors.push_back(contractor);
@@ -79,10 +77,8 @@ class Users : public cppcms::application {
 
     add_menu(empl, *this);
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
-    soci::rowset<Employee> employees = (sql.prepare << "select * from users where role='employee'");
+    DataBase db(db_source);
+    soci::rowset<Employee> employees = (db.prepare("select * from users where role='employee'"));
     std::vector<Employee> all_employees;
     for (auto& employee : employees) {
       all_employees.push_back(employee);
@@ -96,9 +92,7 @@ class Users : public cppcms::application {
 
     add_menu(usr, *this);
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
+    DataBase db(db_source);
 
     User user = get_user_by_id(id);
 
@@ -108,7 +102,7 @@ class Users : public cppcms::application {
       User current_user = get_user(*this);
 
       int cnt;
-      sql << "select count(*) from subscriptions where contractor_id=:contractor_id and user_id=:user_id",
+      db << "select count(*) from subscriptions where contractor_id=:contractor_id and user_id=:user_id",
           soci::use(id), soci::use(current_user.id), soci::into(cnt);
 
       if (cnt != 0) {
@@ -121,7 +115,7 @@ class Users : public cppcms::application {
     if (session().is_set("username")) {
       User current_user = get_user(*this);
       usr.my_rate = 0;
-      sql << "select rate from rates where rater_id=:rater_id and target_id=:target_id",
+      db << "select rate from rates where rater_id=:rater_id and target_id=:target_id",
           soci::use(current_user.id), soci::use(id), soci::into(usr.my_rate);
 
       usr.my_id = current_user.id;
@@ -139,14 +133,12 @@ class Users : public cppcms::application {
 
   virtual void subscribe(std::string id) {
     if (session().is_set("username")) {
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
+      DataBase db(db_source);
       Contractor contractor;
-      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
+      db << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
 
       User user;
-      sql << "select * from users where username=:username",
+      db << "select * from users where username=:username",
           soci::use(session()["username"]), soci::into(user);
 
       contractor.register_observer(user);
@@ -158,14 +150,12 @@ class Users : public cppcms::application {
 
   virtual void unsubscribe(std::string id) {
     if (session().is_set("username")) {
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
+      DataBase db(db_source);
       Contractor contractor;
-      sql << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
+      db << "select * from users where id=:id and role='contractor'", soci::use(id), soci::into(contractor);
 
       User user;
-      sql << "select * from users where username=:username",
+      db << "select * from users where username=:username",
           soci::use(session()["username"]), soci::into(user);
 
       contractor.remove_observer(user);
@@ -184,9 +174,7 @@ class Users : public cppcms::application {
 
       edt.edit_form.load(context());
       auto current_user = get_user(*this);
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
+      DataBase db(db_source);
       std::string avatar_name;
       std::string cover_name;
 
@@ -200,7 +188,7 @@ class Users : public cppcms::application {
         edt.edit_form.avatar_file.value()->save_to("./media/images/" + avatar_name);
         current_user.avatar = avatar_name;
 
-        sql << "update users "
+        db << "update users "
                "set avatar = :avatar "
                "where id = :id", soci::use(avatar_name), soci::use(current_user.id);
       }
@@ -214,7 +202,7 @@ class Users : public cppcms::application {
         }
         edt.edit_form.cover_file.value()->save_to("./media/images/" + cover_name);
         current_user.cover = cover_name;
-        sql << "update users "
+        db << "update users "
                "set cover = :cover "
                "where id = :id", soci::use(cover_name), soci::use(current_user.id);
 
@@ -224,11 +212,9 @@ class Users : public cppcms::application {
     }
 
 
-    std::string src = "dbname=";
-    src += db_source;
-    soci::session sql("sqlite3", src);
+    DataBase db(db_source);
     User user;
-    sql << "select * from users where id=:id", soci::use(id), soci::into(user);
+    db << "select * from users where id=:id", soci::use(id), soci::into(user);
 
     if (session().is_set("username") && session()["username"] == user.username) {
       edt.is_me = true;
@@ -244,25 +230,23 @@ class Users : public cppcms::application {
     if (request().request_method() == "POST" && session().is_set("username")) {
       auto current_user = get_user(*this);
 
-      std::string src = "dbname=";
-      src += db_source;
-      soci::session sql("sqlite3", src);
+      DataBase db(db_source);
 
       int cnt;
-      sql << "select count(*) from rates where rater_id=:rater_id and target_id=:target_id",
+      db << "select count(*) from rates where rater_id=:rater_id and target_id=:target_id",
           soci::use(current_user.id), soci::use(id), soci::into(cnt);
 
       if (cnt == 0) {
-        sql << "insert into rates (rater_id, target_id, rate) values(:rater_id, :target_id, :rate)",
+        db << "insert into rates (rater_id, target_id, rate) values(:rater_id, :target_id, :rate)",
             soci::use(current_user.id), soci::use(id), soci::use(std::stod(grade));
       } else {
-        sql << "update rates "
+        db << "update rates "
                "set rate=:rate "
                "where rater_id=:rater_id and target_id=:target_id", soci::use(grade), soci::use(current_user.id), soci::use(id);
       }
 
       target_user.rate = calculate_rating(target_user);
-      sql << "update users "
+      db << "update users "
              "set rate=:rate "
              "where id=:id ", soci::use(target_user);
     }

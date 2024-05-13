@@ -16,4 +16,8 @@ class DataBase {
   auto prepare(const std::string& request) {
     return sql.prepare << request;
   }
+
+  auto got_data() const {
+    return sql.got_data();
+  }
 };
