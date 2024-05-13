@@ -258,7 +258,7 @@ img {
 
 @font-face {
     font-family: Tungsten;
-    src: url('/media/fonts/TungstenNarrow-Bold.otf');
+    src: url('/media/fonts/TungstenNarrow-Bold.ttf');
     font-weight: normal;
     font-style: normal;
 }
