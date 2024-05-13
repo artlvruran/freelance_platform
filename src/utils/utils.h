@@ -31,9 +31,9 @@ void add_menu(T& object, cppcms::application& app) {
   object.menuList.push_back(std::pair<std::string,std::string>("/users/employees","Creatives"));
   object.menuList.push_back(std::pair<std::string,std::string>("/signup","Sign up"));
   object.menuList.push_back(std::pair<std::string,std::string>("/login","Log in"));
-  object.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
 
   if (app.session().is_set("username")) {
+    object.menuList.push_back(std::pair<std::string,std::string>("/logout","Log out"));
     object.menuList.push_back(std::pair<std::string,std::string>("/notifications","notifications"));
     std::vector<std::pair<int, std::string>> notifications;
 
