@@ -8,29 +8,29 @@
 #include <cppcms/form.h>
 #include "tmpl_master.h"
 
+using namespace cppcms;
+
+
+
 namespace Data {
-  struct infoForm : public cppcms::form {
-    cppcms::widgets::text username;                        // титул страницы
-    cppcms::widgets::text email;                   // описание страницы
-    cppcms::widgets::text password;                 // описание страницы
+  struct loginForm : public cppcms::form {
+    cppcms::widgets::text username;
+    cppcms::widgets::password password;
     cppcms::widgets::select role;
     cppcms::widgets::submit submit;
 
-    infoForm() {
+    loginForm() {
       username.message("Your nickname");
-      email.message("Your email");
       password.message("Your password");
       role.message("Your role");
       submit.value("Submit");
 
       add(username);
-      add(email);
       add(password);
       add(role);
       add(submit);
 
       username.non_empty();
-      email.non_empty();
       password.non_empty();
       role.add("employee");
       role.add("contractor");
@@ -38,7 +38,45 @@ namespace Data {
     }
   };
 
+  struct signupForm : public cppcms::form {
+    cppcms::widgets::text username;
+    cppcms::widgets::password password;
+    cppcms::widgets::select role;
+    cppcms::widgets::submit submit;
+    cppcms::widgets::email email;
+    cppcms::widgets::text fullname;
+
+    signupForm(){
+      username.message("Your nickname");
+      fullname.message("Your full name");
+      email.message("Your email");
+      password.message("Your password");
+      role.message("Your role");
+      submit.value("Submit");
+
+      add(username);
+      add(fullname);
+      add(email);
+      add(password);
+      add(role);
+      add(submit);
+
+      username.non_empty();
+      password.non_empty();
+      role.add("employee");
+      role.add("contractor");
+      role.non_empty();
+      fullname.non_empty();
+      email.non_empty();
+    }
+
+  };
+
   struct Signup : public Master {
-    Data::infoForm info;
+    Data::signupForm info;
+  };
+
+  struct Login : public Master {
+    Data::loginForm info;
   };
 }

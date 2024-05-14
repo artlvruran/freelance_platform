@@ -5,8 +5,8 @@
 #pragma once
 
 #include <cppcms/view.h>
-#include "../src/project.h"
-#include "../src/bid.h"
+#include "../src/models/project.h"
+#include "../src/models/bid.h"
 #include "tmpl_master.h"
 namespace Data {
 
@@ -16,9 +16,14 @@ struct singleUserPage {
 
   singleUserPage(){};
   ~singleUserPage(){};
+
+
 };
 
 struct SingleUser : public Master {
   Data::singleUserPage user_page;
+  bool is_me = false;
+  double my_rate = 0;
+  int my_id = -1;
 };
 }

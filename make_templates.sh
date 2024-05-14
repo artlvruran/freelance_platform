@@ -30,7 +30,19 @@ TEMPLATES="$INPUT/templates/master.tmpl
            $INPUT/templates/project.tmpl
            $INPUT/templates/add_project.tmpl
            $INPUT/templates/contractors.tmpl
-           $INPUT/templates/user.tmpl"
+           $INPUT/templates/employees.tmpl
+           $INPUT/templates/user.tmpl
+           $INPUT/templates/login.tmpl
+           $INPUT/templates/profile_edit.tmpl
+           $INPUT/templates/notifications.tmpl
+           $INPUT/templates/main.tmpl
+           $INPUT/templates/chat.tmpl
+           $INPUT/templates/add_task.tmpl
+           $INPUT/templates/add_long.tmpl
+           $INPUT/templates/add_contest.tmpl
+           $INPUT/templates/tasks.tmpl
+           $INPUT/templates/longs.tmpl
+           $INPUT/templates/contests.tmpl"
 
 cppcms_tmpl_cc $TEMPLATES -o $INPUT/all_tmpl.cpp
 

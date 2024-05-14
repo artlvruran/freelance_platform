@@ -4,8 +4,7 @@
 #include "user.h"
 #include <soci/soci.h>
 #include "constants.h"
-#include "database.h"
-#include "chrono"
+#include "../database.h"
 
 void User::notify(int contractor_id) {
   DataBase db(db_source);

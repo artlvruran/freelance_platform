@@ -3,8 +3,6 @@
 //
 #pragma once
 #include <iostream>
-#include "constants.h"
-#include "db_pool.h"
 
 class DataBase {
   soci::session sql;
@@ -17,5 +15,9 @@ class DataBase {
 
   auto prepare(const std::string& request) {
     return sql.prepare << request;
+  }
+
+  auto got_data() const {
+    return sql.got_data();
   }
 };

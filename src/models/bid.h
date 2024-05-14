@@ -15,7 +15,7 @@ class Bid {
 
   int employee_id;
   std::unique_ptr<BidState> state = std::make_unique<BidStateConsidering>();
-  void advance(bid_event e);
+  void advance(bid_event exception);
 
   Bid() = default;
 

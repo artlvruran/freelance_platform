@@ -1,6 +1,6 @@
-
-
-
+body {
+    font-family: "San Francisco Display Medium";
+}
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -15,5 +15,424 @@
     display: flex;
     flex: 0 0 100%;
     flex-direction: column;
-    max-width: 33.3333333333%;
+}
+
+.custom-form{
+    max-width:400px;
+    margin:50px auto;
+    background:#fff;
+    border-radius:2px;
+    padding:20px;
+}
+.custom-form h1{
+    display: block;
+    text-align: center;
+    padding: 0;
+    margin: 0px 0px 20px 0px;
+    color: #5C5C5C;
+    font-size:x-large;
+}
+.custom-form ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+.custom-form li{
+    display: block;
+    padding: 9px;
+    border:1px solid #DDDDDD;
+    margin-bottom: 30px;
+    border-radius: 3px;
+}
+.custom-form li:last-child{
+    border:none;
+    margin-bottom: 0px;
+    text-align: center;
+}
+.custom-form li > label{
+    display: block;
+    float: left;
+    margin-top: -19px;
+    background: #FFFFFF;
+    height: 14px;
+    padding: 2px 5px 2px 5px;
+    color: #B9B9B9;
+    font-size: 14px;
+    overflow: hidden;
+}
+.custom-form input[type="text"],
+.custom-form input[type="date"],
+.custom-form input[type="datetime"],
+.custom-form input[type="email"],
+.custom-form input[type="number"],
+.custom-form input[type="search"],
+.custom-form input[type="time"],
+.custom-form input[type="url"],
+.custom-form input[type="password"],
+.custom-form textarea,
+.custom-form select
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    display: block;
+    outline: none;
+    border: none;
+    height: 25px;
+    line-height: 25px;
+    font-size: 16px;
+    padding: 0;
+}
+.custom-form input[type="text"]:focus,
+.custom-form input[type="date"]:focus,
+.custom-form input[type="datetime"]:focus,
+.custom-form input[type="email"]:focus,
+.custom-form input[type="number"]:focus,
+.custom-form input[type="search"]:focus,
+.custom-form input[type="time"]:focus,
+.custom-form input[type="url"]:focus,
+.custom-form input[type="password"]:focus,
+.custom-form textarea:focus,
+.custom-form select:focus
+{
+}
+.custom-form li > span{
+    background: #F3F3F3;
+    display: block;
+    padding: 3px;
+    margin: 0 -9px -9px -9px;
+    text-align: center;
+    color: #C0C0C0;
+    font-size: 11px;
+}
+.custom-form textarea{
+    resize:none;
+}
+.custom-form input[type="submit"],
+.custom-form input[type="button"]{
+    background: #2471FF;
+    border: none;
+    padding: 10px 20px 10px 20px;
+    border-bottom: 3px solid #5994FF;
+    border-radius: 3px;
+    color: #D2E2FF;
+}
+.custom-form input[type="submit"]:hover,
+.custom-form input[type="button"]:hover{
+    background: #6B9FFF;
+    color:#fff;
+}
+
+
+@font-face {
+    font-family: "San Francisco Display Ultralight";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-ultralight-webfont.eot?#iefix) format("embedded-opentype"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-ultralight-webfont.woff2) format("woff2"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-ultralight-webfont.woff) format("woff"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-ultralight-webfont.ttf) format("truetype"), url("fonts/sanfrancisco/sanfranciscodisplay-ultralight-webfont.svg#San Francisco Display Ultralight") format("svg")
+}
+
+@font-face {
+    font-family: "San Francisco Display Thin";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-thin-webfont.eot?#iefix) format("embedded-opentype"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-thin-webfont.woff2) format("woff2"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-thin-webfont.woff) format("woff"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-thin-webfont.ttf) format("truetype"), url("fonts/sanfrancisco/sanfranciscodisplay-thin-webfont.svg#San Francisco Display Thin") format("svg")
+}
+
+@font-face {
+    font-family: "San Francisco Display Medium";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.eot?#iefix) format("embedded-opentype"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.woff2) format("woff2"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.woff) format("woff"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.ttf) format("truetype"), url("fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.svg#San Francisco Display Medium") format("svg")
+}
+
+@font-face {
+    font-family: "San Francisco Display Semibold";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.eot?#iefix) format("embedded-opentype"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.woff2) format("woff2"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.woff) format("woff"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.ttf) format("truetype"), url("fonts/sanfrancisco/sanfranciscodisplay-semibold-webfont.svg#San Francisco Display Semibold") format("svg")
+}
+
+@font-face {
+    font-family: "San Francisco Display Bold";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.eot?#iefix) format("embedded-opentype"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.woff2) format("woff2"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.woff) format("woff"), url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.ttf) format("truetype"), url("fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.svg#San Francisco Display Bold") format("svg")
+}
+
+.profile-cover {
+    background-color: black;
+    margin-bottom: 0;
+}
+
+.profile-caption {
+    max-height: 800px;
+    position: absolute;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    left: 0;
+    right: 0;
+    top: 105px;
+    bottom: 0;
+    font-family: Tungsten, serif;
+    font-style: normal;
+}
+
+.profile-sidebar {
+    padding-left: 30px;
+    padding-right: 15px;
+    text-align: center;
+    width: 275px;
+}
+
+.profile-sidebar-avatar {
+    border-color: white;
+    background-color: black;
+    position: relative;
+}
+
+.profile-info {
+    border-style: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.profile-metrics {
+    margin: 0;
+    padding: 0;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    display: flex;
+    border-style: solid;
+    border-color: lightgray;
+    border-width: 1px;
+}
+
+.image-avatar {
+    object-fit: cover;
+    width: 230px;
+    height: 230px;
+    background: gray;
+}
+
+img {
+    overflow: clip;
+    overflow-clip-margin: content-box;
+}
+
+.trans3 {
+    opacity: 0.5;
+}
+.user_title {
+    position: relative;
+    letter-spacing: 0.2rem;
+    font-size: 9rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    line-height: 7rem;
+    text-transform: uppercase;
+    color: white;
+    text-align: center;
+}
+.object-cover {
+    object-fit: cover;
+    max-height: 800px;
+}
+.generalobject-cover {
+    object-fit: cover;
+}
+
+.right {
+    position: absolute;
+    right: 16px;
+}
+.avatar {
+    border-radius: 100%;
+    height: 53px !important;
+    width: 53px !important;
+}
+
+@font-face {
+    font-family: Tungsten;
+    src: url('/media/fonts/TungstenNarrow-Bold.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.card-cover {
+    height: 80% !important;
+}
+
+.profile {
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-bottom: 10%;
+    margin-top: 10%;
+}
+
+.middle {
+}
+
+.footer-caption {
+    text-align: center;
+    color: white;
+    font-family: "Tangerine", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.project-author-avatar {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.euro-input {
+    padding-left: 25px !important;
+    background: url("/media/images/euro.png") no-repeat left;
+    background-size: 20px;
+}
+.rating {
+    position: relative;
+    text-align: center;
+    transform: rotateY(180deg);
+}
+.rating input {
+    display: none;
+}
+.rating label {
+    cursor: pointer;
+    width: 25px;
+}
+.rating label:before {
+    width: 25px;
+    content: '★';
+    position: relative;
+    display: block;
+    font-size: 25px;
+    color: #101010;
+}
+.rating label:after {
+    width: 25px;
+    content: '★';
+    position: absolute;
+    display: block;
+    font-size: 25px;
+    color: #1f9cff;
+    opacity: 0;
+    top: 0;
+    transition: .5s;
+}
+.rating label:hover:after,
+.rating input:checked ~ label:after {
+    opacity: 1;
+}
+
+
+.messages_list {
+    --sentColor: #0b93f6;
+    --receiveColor: #e5e5ea;
+    --bg: #fff;
+
+    display: flex;
+    flex-direction: column;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+}
+.shared {
+    position: relative;
+    max-width: 255px;
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    line-height: 24px;
+    word-wrap: break-word;
+    border-radius: 25px;
+    min-height: 44px;
+
+    &:before {
+        width: 20px;
+    }
+
+    &:after {
+        width: 26px;
+        background-color: var(--bg);
+    }
+
+    &:before,
+    &:after {
+        position: absolute;
+        bottom: 0;
+        height: 25px;
+        content: '';
+    }
+}
+
+.sent {
+    align-self: flex-end;
+    color: white;
+    background: var(--sentColor);
+
+    &:before {
+        right: -7px;
+        background-color: var(--sentColor);
+        border-bottom-left-radius: 16px 14px;
+    }
+
+    &:after {
+        right: -26px;
+        border-bottom-left-radius: 10px;
+    }
+}
+.received {
+    align-self: flex-start;
+    color: black;
+    background: var(--receiveColor);
+
+    &:before {
+        left: -7px;
+        background-color: var(--receiveColor);
+        border-bottom-right-radius: 16px 14px;
+    }
+
+    &:after {
+        left: -26px;
+        border-bottom-right-radius: 10px;
+    }
+}
+.text_input {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+}
+.text_input input[type=submit]{
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    background: #0b93f6;
+    background-size: 24px;
+    border-width: 0;
+    color: white;
+    position: relative;
+}
+.text_input textarea {
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 400;
+    color: #3F3F3F;
+    width: 450px;
+    height: 6em;
+    line-height: 1.5em;
+    background-color: #F7F7F7;
+    border: none;
+    overflow: auto;
+    resize: none;
+    position: relative;
+    margin-right: -76px;
+    padding-right: 76px;
 }

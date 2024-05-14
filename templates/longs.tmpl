@@ -1,0 +1,82 @@
+<% c++ #include "data/tmpl_projects.h" %>
+<% skin defskin %>
+<% view Longs uses Data::Longs extends Master%>
+<% template page_content() %>
+<ul class="list-group list-group-horizontal-lg">
+    <li class="list-group-item">
+        <a href="/projects">All</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=1">Tasks</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=2">Vacancies</a>
+    </li>
+    <li class="list-group-item">
+        <a href="/projects/?kind=3">Contests</a>
+    </li>
+</ul>
+<div class="row">
+    <% foreach project in projects_page.projects %>
+    <% item %>
+    <div class="card mb-3 rounded-0 p-0" style="width: 30%; height: auto; margin: 1.6666666%; box-shadow: 0 6px 36px rgba(0,0,0,.06);">
+        <div class="row m-0" style="height: 100%">
+            <div class="col p-0" style="height: 100%">
+                <img class="project-author-avatar" src="/media/images/<%= project.second.avatar %>">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title" style="font-weight: bold">
+                        <a class="nav-link card-title" href="/projects/<%= project.first.id %>">
+                            <%= project.first.name %>
+                        </a>
+                    </h2>
+                    <h4 class="card-text">
+                        <%= project.second.fullname %>
+                    </h4>
+                    <div class="card-text">
+                        <p class="m-0">
+                            <small class="text-muted">
+                                € <%= project.first.wage %> | <%= project.first.location %>
+                            </small>
+                        </p>
+                        <p>
+                            <small class="text-muted">
+                                status:
+                                <% if (project.first.state->integer() == 0) %>
+                                not started
+                                <% elif (project.first.state->integer() == 1) %>
+                                hiring
+                                <% elif (project.first.state->integer() == 2) %>
+                                in progress
+                                <% else %>
+                                finished
+                                <% end %>
+                            </small>
+                        </p>
+                    </div>
+
+                    <div class="card-footer text-muted">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <small class="text-muted">
+                                    Format: <%= project.first.format %>
+                                </small>
+                            </li>
+                            <li class="list-group-item">
+                                <small class="text-muted">
+                                    Specialization: <%= project.first.specialization %>
+                                </small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% end %>
+    <% end %>
+</div>
+<% end template %>
+<% end view %>
+<% end skin %>

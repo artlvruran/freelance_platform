@@ -2,14 +2,12 @@
 // Created by kirill on 26.02.24.
 //
 #include "employee.h"
-#include "sqlite3.h"
 #include "constants.h"
-#include "database.h"
-#include <boost/format.hpp>
+#include "../database.h"
 
 void Employee::sign_up() {
   DataBase db(db_source);
-  db << "insert into users (username, email, password, role) values(:username, :email, :password, 'employee')", soci::use(*this);
+  db << "insert into users (username, email, password, role, fullname) values(:username, :email, :password, 'employee', :fullname)", soci::use(*this);
 }
 
 bool Employee::log_in() {

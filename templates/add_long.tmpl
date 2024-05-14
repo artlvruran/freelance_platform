@@ -1,10 +1,10 @@
-<% c++ #include "data/tmpl_signup.h" %>
+<% c++ #include "data/tmpl_add_project.h" %>
 <% skin defskin %>
-<% view Signup uses Data::Signup extends Master%>
+<% view AddLong uses Data::AddLong extends Master%>
 <% template page_content() %>
 
 <form action="" method="post" class="custom-form"> <% csrf %>
-<% form as_p info %>
+    <% form as_p add_project_form %>
 </form>
 
 <% end template %>

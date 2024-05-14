@@ -4,13 +4,12 @@
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"
-#include "database.h"
 #include <boost/format.hpp>
 #include <string>
 
 void Contractor::sign_up() {
   DataBase db(db_source);
-  db << "insert into users (username, email, password, role) values(:username, :email, :password, 'contractor')", soci::use(*this);
+  db << "insert into users (username, email, password, fullname, role) values(:username, :email, :password, :fullname, 'contractor')", soci::use(*this);
   int idd;
   db << "select id from users "
          "  where username == :username", soci::into(idd), soci::use(username);
@@ -40,10 +39,11 @@ void Contractor::consider_bid(Bid& bid, bid_event e) {
   bid.advance(e);
 }
 
-void Contractor::add_project(Project &project) {
+void Contractor::add_project(Project &project) const {
   DataBase db(db_source);
   db << (boost::format("insert into projects (name, contractor_id, state)"
          "values(:name, %d, :state)") % id).str(), soci::use(project);
+  project.load(id);
   db << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
@@ -56,18 +56,18 @@ void Contractor::fire_worker(const Project& project, const Employee& employee) {
          "where employee_id == :id and project_id == :id1", soci::use(employee.id), soci::use(project.id);
 }
 
-void Contractor::end_project(Project& project) {
+void Contractor::end_project(Project& project) const {
   project.advance(event::completed);
   notify_observers("Project " + project.name + " has been ended.");
 }
 
-void Contractor::start_project_hiring(Project& project) {
+void Contractor::start_project_hiring(Project& project) const {
   project.advance(event::start);
   notify_observers("Project " + project.name + " has started its hiring.");
 }
 
 
-void Contractor::end_project_hiring(Project& project) {
+void Contractor::end_project_hiring(Project& project) const {
   project.advance(event::hired);
   notify_observers("Project " + project.name + " has finished its hiring.");
 }

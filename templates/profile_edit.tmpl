@@ -1,0 +1,14 @@
+<% c++ #include "data/tmpl_profile_edit.h" %>
+<% skin defskin %>
+<% view ProfileEdit uses Data::ProfileEdit extends Master%>
+<% template page_content() %>
+
+<% if (content.is_me) %>
+    <form action="" method="POST" enctype="multipart/form-data" class="custom-form"> <% csrf %>
+        <% form as_p edit_form %>
+    </form>
+<% end %>
+
+<% end template %>
+<% end view %>
+<% end skin %>

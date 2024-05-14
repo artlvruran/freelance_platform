@@ -6,8 +6,8 @@
 #pragma once
 
 #include <cppcms/view.h>
-#include "../src/project.h"
-#include "../src/bid.h"
+#include "../src/models/project.h"
+#include "../src/models/bid.h"
 #include "tmpl_master.h"
 namespace Data {
 
@@ -17,7 +17,7 @@ struct singleProjectPage {
   bool has_right = false;
   bool is_employee = false;
   bool is_bid_created = false;
-  std::vector<Bid> bids;
+  std::vector<std::pair<Bid, Employee>> bids;
 
   singleProjectPage(){};
   ~singleProjectPage(){};
