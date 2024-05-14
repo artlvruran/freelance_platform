@@ -1,0 +1,38 @@
+{
+  "WebSite" : {
+    "root" : "",
+    "host" : "localhost:8080",
+    "locdomain" : "localhost"
+  },
+  "service" : {
+    "ip"  : "0.0.0.0",
+    "api" : "http",
+    "port" : 8080
+  },
+  "http" : {
+    "script" : "/mb.fcgi" ,
+    "rewrite" : [
+      { "regex" : "/media(/.+)", "pattern" : "$1" },
+      { "regex" : ".*" , "pattern" : "/mb.fcgi$0" }
+    ]
+  },
+  "views" : {
+    "default_skin" : "defskin" ,
+    "paths" : [ "./" ],
+    "skins" : [ "cpp_defskin" ]
+  },
+  "file_server" : {
+    "enable" : true,
+    "listing" : true,
+    "document_root" : "./media"
+  },
+  "session" : {
+    "expire" : "renew",
+    "timeout" : 604800,
+    "location" : "client",
+    "client" :      {
+      "hmac" :        "sha1",
+      "hmac_key" :    "3891bbf7f845fd4277008a63d72640fc13bb9a31"
+    }
+  }
+}

@@ -23,6 +23,38 @@ class Project {
           name(std::move(name))
           {};
 
+  Project(const Project& other) :
+          id(other.id),
+          contractor_id(other.contractor_id),
+          name(other.name)
+  {
+    if (other.state->integer() == 0) {
+      state = std::make_unique<NotStarted>();
+    } else if (other.state->integer() == 1) {
+      state = std::make_unique<Preparing>();
+    } else if (other.state->integer() == 2) {
+      state = std::make_unique<Processing>();
+    } else {
+      state = std::make_unique<Completed>();
+    }
+  }
+
+  Project& operator=(const Project& other) {
+    id = other.id;
+    contractor_id = other.contractor_id;
+    name = other.name;
+    if (other.state->integer() == 0) {
+      state = std::make_unique<NotStarted>();
+    } else if (other.state->integer() == 1) {
+      state = std::make_unique<Preparing>();
+    } else if (other.state->integer() == 2) {
+      state = std::make_unique<Processing>();
+    } else {
+      state = std::make_unique<Completed>();
+    }
+    return *this;
+  }
+
   void advance(event e);
  private:
 };
@@ -52,11 +84,11 @@ template<>
         project.contractor_id = values.get<int>("contractor_id", 0);
 
         int int_status = values.get<int>("state", 0);
-        if (int_status == 1) {
+        if (int_status == 0) {
           project.state = std::make_unique<NotStarted>();
-        } else if (int_status == 2) {
+        } else if (int_status == 1) {
           project.state = std::make_unique<Preparing>();
-        } else if (int_status == 3) {
+        } else if (int_status == 2) {
           project.state = std::make_unique<Processing>();
         } else {
           project.state = std::make_unique<Completed>();

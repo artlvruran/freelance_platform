@@ -14,14 +14,14 @@ class Contractor : public User {
   Contractor() = default;
 
   void add_project(Project& project);
-  void consider_bid(Bid& bid, bid_event exception);
+  void consider_bid(Bid& bid, bid_event event);
   void fire_worker(const Project& project, const Employee& employee);
   void end_project(Project& project);
   void start_project_hiring(Project& project);
   void end_project_hiring(Project& project);
-  void sign_up() override;
+  void sign_up();
 
-  bool log_in() override;
+  bool log_in();
 
 
   void register_observer(const User& user) const;
@@ -41,7 +41,7 @@ namespace soci {
         contractor.username = values.get<std::string>("username", {});
         contractor.email = values.get<std::string>("email", {});
         contractor.password = values.get<std::string>("password", {});
-      } catch (std::exception const & exception) { 
+      } catch (std::exception const & exception) {
         std::cerr << exception.what() << std::endl;
       }
     }
@@ -55,7 +55,7 @@ namespace soci {
         values.set("role", std::string("contractor"));
         ind = i_ok;
         return;
-      } catch (std::exception const& exception) { 
+      } catch (std::exception const& exception) {
         std::cerr << exception.what() << std::endl;
       }
       ind = i_null;

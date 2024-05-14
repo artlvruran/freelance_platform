@@ -1,7 +1,6 @@
 //
 // Created by kirill on 26.02.24.
 //
-
 #include "contractor.h"
 #include "sqlite3.h"
 #include "constants.h"
@@ -48,6 +47,7 @@ void Contractor::add_project(Project &project) {
   db << "select id from projects "
          "where name == :name", soci::use(project.name), soci::into(project.id);
   project.advance(event::start);
+  notify_observers("Project " + project.name + " has been created.");
 }
 
 void Contractor::fire_worker(const Project& project, const Employee& employee) {

@@ -14,7 +14,6 @@ enum bid_event {
 struct BidState {
   virtual std::unique_ptr<BidState> on_event(bid_event e) = 0;
   virtual std::string str() const = 0;
-  ~BidState() = default;
 };
 
 struct BidStateConsidering : BidState {

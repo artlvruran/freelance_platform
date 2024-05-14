@@ -20,13 +20,8 @@ bool Employee::log_in() {
   return cnt == 1;
 }
 
-Bid Employee::create_bid(int project_id) {
+void Employee::create_bid(int project_id) {
   DataBase db(db_source);
-
   db << "insert into bids (project_id, employee_id, state) "
          "values(:project_id, :employee_id, 'considering')", soci::use(project_id), soci::use(id);
-  int bid_id;
-  db << "select count(*) from bids ", soci::into(bid_id);
-  Bid bid{bid_id, id, project_id};
-  return bid;
 }
